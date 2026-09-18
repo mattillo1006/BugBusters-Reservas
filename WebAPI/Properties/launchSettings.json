@@ -1,14 +1,18 @@
 ﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5068",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+  "ConnectionStrings": {
+    "Default": "Server=localhost;Database=ReservasLaboratorios;UserId=sa;Password=123456;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+    "$schema": "https://json.schemastore.org/launchsettings.json",
+    "profiles": {
+      "http": {
+        "commandName": "Project",
+        "dotnetRunMessages": true,
+        "launchBrowser": true,
+        "launchUrl": "scalar",
+        "applicationUrl": "http://localhost:5068",
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+        }
       }
     }
   }
-}
