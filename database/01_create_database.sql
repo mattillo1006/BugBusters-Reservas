@@ -28,11 +28,10 @@ CREATE TABLE Usuarios (
     NombreUsuario NVARCHAR(50) NOT NULL,
     NombreCompleto NVARCHAR(150) NOT NULL,
     Correo NVARCHAR(150) NOT NULL,
-    PasswordHash NVARCHAR(255) NOT NULL,
+    Contraseña NVARCHAR(255) NOT NULL,
     RolId INT NOT NULL,
     Activo BIT NOT NULL CONSTRAINT DF_Usuarios_Activo DEFAULT (1),
     FechaRegistro DATETIME2 NOT NULL CONSTRAINT DF_Usuarios_Fecha DEFAULT (SYSDATETIME()),
-    Active BIT NOT NULL CONSTRAINT DF_Usuarios_Active DEFAULT (1),
     CONSTRAINT PK_Usuarios PRIMARY KEY (UsuarioId),
     CONSTRAINT UQ_Usuarios_Nombre UNIQUE (NombreUsuario),
     CONSTRAINT UQ_Usuarios_Correo UNIQUE (Correo),
@@ -111,7 +110,7 @@ VALUES
 -- ------------------------------------------------------------
 -- USUARIOS
 -- ------------------------------------------------------------
-INSERT INTO Usuarios (NombreUsuario, NombreCompleto, Correo, PasswordHash, RolId)
+INSERT INTO Usuarios (NombreUsuario, NombreCompleto, Correo, Contraseña, RolId)
 VALUES 
 ('Admi', 'Administrador General', 'admin@utn.ac.cr', 'Laboratorios123#', 1),
 ('user01', 'Matthew', 'matthew@utn.ac.cr', 'Laboratorios123#', 2),
@@ -151,7 +150,7 @@ VALUES (1, 2, 'El usuario no pudo asistir');
 SELECT * FROM Roles;
 
 -- Ver todos los usuarios con su rol
-SELECT U.UsuarioId, U.NombreUsuario, U.NombreCompleto, U.Correo, R.NombreRol, U.Activo, U.FechaRegistro, U.Active
+SELECT U.UsuarioId, U.NombreUsuario, U.NombreCompleto, U.Correo, R.NombreRol, U.Contraseña, U.FechaRegistro, U.Activo
 FROM Usuarios U
 INNER JOIN Roles R ON U.RolId = R.RolId;
 
