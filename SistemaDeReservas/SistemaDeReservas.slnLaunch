@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Perfil de Arranque Simultaneo",
+    "Projects": [
+      {
+        "Path": "..\\WebAPI\\WebAPI.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      },
+      {
+        "Path": "SistemaDeReservas.csproj",
+        "Action": "Start",
+        "DebugTarget": "http"
+      }
+    ]
+  }
+]
