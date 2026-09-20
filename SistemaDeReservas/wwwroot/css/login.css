@@ -1,0 +1,315 @@
+﻿/* ==========================================================
+   LOGIN - SistemaDeReservas
+   Orden: variables > base > fondo > tarjeta > formulario >
+          botón > lava lamp > responsive > accesibilidad
+   ========================================================== */
+
+:root {
+    --color-tarjeta: #262b4d;
+    --color-texto: #fff;
+    --color-error: #ff8a8a;
+    --color-boton: #1268f3;
+    --color-boton-hover: #0b55cc;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------- Fondo: degradado vertical azul ---------- */
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px;
+    display: grid;
+    place-items: center;
+    font-family: "Montserrat", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, #4a57b0 0%, #2b3579 35%, #151b48 70%, #080816 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+
+/* ---------- Tarjeta ---------- */
+.login-tarjeta {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    width: min(94vw, 1100px);
+    min-height: 640px;
+    background: var(--color-tarjeta);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 20, .55);
+}
+
+/* Imagen con tinte azul */
+.login-imagen {
+    position: relative;
+    background: url("../img/login.jpg") center / cover no-repeat;
+    border-radius: 32px;
+}
+
+    .login-imagen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: rgba(40, 40, 210, .45);
+        mix-blend-mode: multiply;
+    }
+
+
+/* ---------- Formulario ---------- */
+.login-formulario {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 64px;
+    color: var(--color-texto);
+}
+
+    .login-formulario h1 {
+        margin: 0 0 44px;
+        text-align: center;
+        font-size: 2.8rem;
+        font-weight: 800;
+    }
+
+    .login-formulario form {
+        display: flex;
+        flex-direction: column;
+    }
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 28px;
+}
+
+    .campo label {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .campo input {
+        height: 48px;
+        padding: 0 16px;
+        background: transparent;
+        border: 2px solid var(--color-texto);
+        border-radius: 12px;
+        color: var(--color-texto);
+        font: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+        .campo input:focus {
+            border-color: var(--color-texto);
+            box-shadow: none;
+        }
+
+        /* Evita el fondo blanco del autocompletado del navegador */
+        .campo input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 100px var(--color-tarjeta) inset;
+            -webkit-text-fill-color: var(--color-texto);
+        }
+
+.login-error {
+    margin-top: 6px;
+    color: var(--color-error);
+    font-size: .85rem;
+}
+
+
+/* ---------- Botón ---------- */
+.login-boton {
+    align-self: flex-end;
+    width: 80%;
+    height: 50px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-boton);
+    color: var(--color-texto);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+}
+
+    .login-boton:hover {
+        background: var(--color-boton-hover);
+    }
+
+    .login-boton:active {
+        transform: scale(.98);
+    }
+
+
+/* ---------- Lava lamp (detrás de la tarjeta) ---------- */
+.lava {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+    .lava span {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(55px);
+        opacity: .85;
+        will-change: transform;
+    }
+
+        /* Cada mancha: tamaño, posición inicial, color y velocidad (el tiempo es el 2.º valor de animation) */
+        .lava span:nth-child(1) {
+            width: 46vmax;
+            height: 46vmax;
+            left: -10vmax;
+            bottom: -22vmax;
+            background: radial-gradient(circle at 30% 30%, #6b7df0, #2b3ea8);
+            animation: lava-a 11s ease-in-out infinite;
+        }
+
+        .lava span:nth-child(2) {
+            width: 36vmax;
+            height: 36vmax;
+            right: -8vmax;
+            bottom: -18vmax;
+            background: radial-gradient(circle at 40% 30%, #3d8bff, #1a3fa0);
+            animation: lava-b 14s ease-in-out infinite;
+        }
+
+        .lava span:nth-child(3) {
+            width: 30vmax;
+            height: 30vmax;
+            left: 30vw;
+            bottom: -20vmax;
+            background: radial-gradient(circle at 50% 40%, #8a6bf0, #3a2a9c);
+            animation: lava-c 12s ease-in-out infinite;
+        }
+
+        .lava span:nth-child(4) {
+            width: 22vmax;
+            height: 22vmax;
+            left: 12vw;
+            top: -10vmax;
+            background: radial-gradient(circle, #4d94ff, #1f4fc0);
+            animation: lava-d 10s ease-in-out infinite;
+        }
+
+        .lava span:nth-child(5) {
+            width: 26vmax;
+            height: 26vmax;
+            right: 15vw;
+            top: -12vmax;
+            background: radial-gradient(circle, #5b6cf0, #2a2f9a);
+            animation: lava-e 15s ease-in-out infinite;
+        }
+
+@keyframes lava-a {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    35% {
+        transform: translate(14vw, -55vh) scale(1.2);
+    }
+
+    70% {
+        transform: translate(4vw, -25vh) scale(.9);
+    }
+}
+
+@keyframes lava-b {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    40% {
+        transform: translate(-16vw, -60vh) scale(.85);
+    }
+
+    75% {
+        transform: translate(-6vw, -30vh) scale(1.15);
+    }
+}
+
+@keyframes lava-c {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    30% {
+        transform: translate(-10vw, -70vh) scale(1.25);
+    }
+
+    60% {
+        transform: translate(12vw, -40vh) scale(.9);
+    }
+}
+
+@keyframes lava-d {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(18vw, 60vh) scale(1.3);
+    }
+}
+
+@keyframes lava-e {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    45% {
+        transform: translate(-14vw, 55vh) scale(.85);
+    }
+
+    80% {
+        transform: translate(-4vw, 25vh) scale(1.1);
+    }
+}
+
+
+/* ---------- Responsive ---------- */
+@media (max-width: 800px) {
+    .login-formulario {
+        padding: 40px 32px;
+    }
+
+        .login-formulario h1 {
+            margin-bottom: 32px;
+            font-size: 2.2rem;
+        }
+}
+
+@media (max-width: 640px) {
+    .login-tarjeta {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .login-imagen {
+        display: none;
+    }
+}
+
+
+/* ---------- Accesibilidad: sin animaciones si el sistema lo pide ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .lava span {
+        animation: none;
+    }
+}

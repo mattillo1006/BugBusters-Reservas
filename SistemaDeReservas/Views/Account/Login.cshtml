@@ -1,0 +1,53 @@
+@model SistemaDeReservas.Models.LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="~/img/icono.png" asp-append-version="true" />
+</head>
+<body>
+
+     <div class="lava" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <main class="login-tarjeta">
+        <div class="login-imagen"></div>
+
+        <section class="login-formulario">
+            <h1>Sign Up</h1>
+
+            <form asp-action="Login" method="post">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                <div asp-validation-summary="ModelOnly" class="login-error"></div>
+
+                <div class="campo">
+                    <label asp-for="Username">Username</label>
+                    <input asp-for="Username" autocomplete="username" />
+                    <span asp-validation-for="Username" class="login-error"></span>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Password">Contraseña</label>
+                    <input asp-for="Password" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="login-error"></span>
+                </div>
+
+                <button type="submit" class="login-boton">Inicio</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>
