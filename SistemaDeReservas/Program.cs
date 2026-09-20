@@ -8,7 +8,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient("WebAPI", c =>
 {
     // Usa el puerto de WebAPI/Properties/launchSettings.json
-    c.BaseAddress = new Uri("https://localhost:7001/");
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5068/";
+    c.BaseAddress = new Uri(apiBaseUrl);
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

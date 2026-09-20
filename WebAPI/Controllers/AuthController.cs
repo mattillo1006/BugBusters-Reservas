@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
 
         var usuario = await _context.Usuarios
             .Include(u => u.Rol)
-            .FirstOrDefaultAsync(u => u.NombreUsuario == request.NombreUsuario && u.Activo);
+            .FirstOrDefaultAsync(u => u.NombreUsuario == request.NombreUsuario);
 
         // Caso negativo: usuario no existe o contraseña incorrecta
         if (usuario is null || usuario.PasswordHash != request.Password)

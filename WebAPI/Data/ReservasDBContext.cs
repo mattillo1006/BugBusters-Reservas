@@ -18,6 +18,8 @@ namespace WebAPI.Data
 
             modelBuilder.Entity<Usuario>().HasOne(u => u.Rol).WithMany().HasForeignKey(u => u.RolId);
 
+            modelBuilder.Entity<Usuario>().Property(u => u.PasswordHash).HasColumnName("Contraseña");
+
         }
     }
 }

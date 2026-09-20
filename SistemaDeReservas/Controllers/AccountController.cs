@@ -29,7 +29,7 @@ public class AccountController : Controller
         try
         {
             response = await client.PostAsJsonAsync("api/auth/login",
-                new { model.Username, model.Password });
+                new { NombreUsuario = model.Username, model.Password });
         }
         catch (HttpRequestException)
         {
@@ -44,11 +44,18 @@ public class AccountController : Controller
         }
 
         var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        if (result is null)
+        {
+            ModelState.AddModelError("", "Respuesta inválida del servidor");
+            return View(model);
+        }
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, model.Username),
-            new("access_token", result!.Token)
+            new(ClaimTypes.NameIdentifier, result.UsuarioId.ToString()),
+            new(ClaimTypes.Name, result.NombreUsuario),
+            new(ClaimTypes.GivenName, result.NombreCompleto),
+            new(ClaimTypes.Role, result.Rol)
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -67,4 +74,4 @@ public class AccountController : Controller
     }
 }
 
-public record LoginResponse(string Token);
+public record LoginResponse(int UsuarioId, string NombreUsuario, string NombreCompleto, string Rol);
