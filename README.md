@@ -196,7 +196,7 @@ En este apartado se presentaran diferentes pruebas que se realizaron en el API c
 
 | Campo                  | Detalle                                                                                                                                   |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar el comportamiento de la API ante una solicitud mal formada (sin credenciales), independientemente de si el usuario existe o no. |
+| **Objetivo**           | Verificar el comportamiento de la pagina web ante una solicitud mal formada (sin credenciales), independientemente de si el usuario existe o no. |
 | **Precondición**       | No se debe escribir nada en los campos de username y contraseña.                                                                          |
 | **Entrada**            | Usuario: ` `<br>Contraseña: ` `                                                                                                           |
 | **Resultado esperado** | El sitio indica en cada uno de los campos un mensaje indicando que ese espacio es obligatorio.                                            |
