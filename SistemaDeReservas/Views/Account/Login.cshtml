@@ -24,14 +24,14 @@
         <div class="login-imagen"></div>
 
         <section class="login-formulario">
-            <h1>Sign Up</h1>
+            <h1>Inicio de Sesion</h1>
 
             <form asp-action="Login" method="post">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                 <div asp-validation-summary="ModelOnly" class="login-error"></div>
 
                 <div class="campo">
-                    <label asp-for="Username">Username</label>
+                    <label asp-for="Username">Usuario</label>
                     <input asp-for="Username" autocomplete="username" />
                     <span asp-validation-for="Username" class="login-error"></span>
                 </div>
