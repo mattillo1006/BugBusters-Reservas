@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReservasLaboratorios.Api.Models;
 using WebAPI.Models;
 
 namespace WebAPI.Data
@@ -9,12 +10,14 @@ namespace WebAPI.Data
         //DbSet es una "Representacion" de las tablas de BD indicandoles el tipo que deberian ser segun el codigo
         public DbSet<Usuario> Usuarios{ get; set; }
         public DbSet<Rol> Roles { get; set; }
+        public DbSet<Laboratorio> Laboratorios  { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //mapear las tablas de la BD para asegurarnos que sean iguales segun la entidad
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
             modelBuilder.Entity<Rol>().ToTable("Roles");
+            modelBuilder.Entity<Laboratorio>().ToTable("Laboratorios");
 
             modelBuilder.Entity<Usuario>().HasOne(u => u.Rol).WithMany().HasForeignKey(u => u.RolId);
 
