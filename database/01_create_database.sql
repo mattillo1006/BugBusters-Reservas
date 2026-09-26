@@ -125,7 +125,7 @@ INSERT INTO Laboratorios (Nombre, Ubicacion, Capacidad, Estado, HoraApertura, Ho
 VALUES
 ('Lab Computo 1', 'Edificio A - Piso 2', 30, 'Habilitado', '07:00', '22:00', 1),
 ('Lab Redes', 'Edificio B - Piso 1', 25, 'Habilitado', '08:00', '20:00', 1),
-('Lab Electrónica', 'Edificio C - Piso 3', 20, 'FueraDeServicio', '09:00', '18:00', 0);
+('Lab Electrónica', 'Edificio C - Piso 3', 20, 'FueraDeServicio', '09:00', '18:00', 1);
 
 
 -- ------------------------------------------------------------
