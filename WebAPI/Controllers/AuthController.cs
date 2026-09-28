@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 using WebAPI.Data;
 using WebAPI.DTOs;
+using WebAPI.Services;
 
 namespace WebAPI;
 
@@ -10,10 +12,12 @@ namespace WebAPI;
 public class AuthController : ControllerBase
 {
     private readonly ReservasDBContext _context;
+    private readonly TokenService _tokenService;
 
-    public AuthController(ReservasDBContext context)
+    public AuthController(ReservasDBContext context, TokenService tokenService)
     {
         _context = context;
+        _tokenService = tokenService;
     }
 
     // POST: api/Auth/login
@@ -42,12 +46,15 @@ public class AuthController : ControllerBase
         }
 
         // Caso positivo
+        var token = _tokenService.GenerarToken(usuario);
+
         var response = new LoginResponse
         {
             UsuarioId = usuario.UsuarioId,
             NombreUsuario = usuario.NombreUsuario,
             NombreCompleto = usuario.NombreCompleto,
-            Rol = usuario.Rol?.NombreRol ?? string.Empty
+            Rol = usuario.Rol?.NombreRol ?? string.Empty,
+            Token = token
         };
 
         return Ok(response);

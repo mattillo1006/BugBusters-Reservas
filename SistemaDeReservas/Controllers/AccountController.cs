@@ -55,7 +55,8 @@ public class AccountController : Controller
             new(ClaimTypes.NameIdentifier, result.UsuarioId.ToString()),
             new(ClaimTypes.Name, result.NombreUsuario),
             new(ClaimTypes.GivenName, result.NombreCompleto),
-            new(ClaimTypes.Role, result.Rol)
+            new(ClaimTypes.Role, result.Rol),
+            new("AccessToken", result.Token)
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -74,4 +75,4 @@ public class AccountController : Controller
     }
 }
 
-public record LoginResponse(int UsuarioId, string NombreUsuario, string NombreCompleto, string Rol);
+public record LoginResponse(int UsuarioId, string NombreUsuario, string NombreCompleto, string Rol, string Token);
