@@ -11,6 +11,7 @@ namespace WebAPI.Data
         public DbSet<Usuario> Usuarios{ get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Laboratorio> Laboratorios  { get; set; }
+        public DbSet<Reserva> Reservas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +19,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
             modelBuilder.Entity<Rol>().ToTable("Roles");
             modelBuilder.Entity<Laboratorio>().ToTable("Laboratorios");
+            modelBuilder.Entity<Reserva>().ToTable("Reservas");
 
             modelBuilder.Entity<Usuario>().HasOne(u => u.Rol).WithMany().HasForeignKey(u => u.RolId);
 

@@ -12,6 +12,6 @@ namespace WebAPI.Models
         public TimeSpan HoraFin { get; set; }
         public string Estado { get; set; } = string.Empty;
         public DateTime FechaRegistro { get; set; }
-        public bool Activo { get; set; }
+        public bool Active { get; set; }
     }
 }
