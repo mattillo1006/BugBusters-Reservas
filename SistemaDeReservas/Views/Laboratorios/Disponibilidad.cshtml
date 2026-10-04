@@ -1,0 +1,107 @@
+﻿@model SistemaDeReservas.Models.DisponibilidadViewModel
+@{
+    ViewData["Title"] = "Disponibilidad";
+    var lab = Model.Laboratorio;
+    var cultura = new System.Globalization.CultureInfo("es-CR");
+    var fin = Model.InicioSemana.AddDays(4);
+}
+
+<a class="volver" asp-controller="Home" asp-action="Index">← Volver a laboratorios</a>
+
+<section class="info-lab">
+    <div>
+        <h1>@lab.Nombre</h1>
+        <span class="lab-estado @(lab.Disponible ? "ok" : "no")">
+            @(lab.Disponible ? "Disponible" : "Fuera de servicio")
+        </span>
+    </div>
+    <ul>
+        <li><strong>📍 Ubicación</strong>@lab.Ubicacion</li>
+        <li><strong>👥 Capacidad</strong>@lab.Capacidad personas</li>
+        <li><strong>🕒 Horario</strong>@Model.HoraApertura.ToString(@"hh\:mm") - @Model.HoraCierre.ToString(@"hh\:mm")</li>
+    </ul>
+</section>
+
+<section class="panel-tabla">
+    <div class="semana-nav">
+        @if (Model.PuedeRetroceder)
+        {
+            <a asp-action="Disponibilidad" asp-route-id="@lab.LaboratorioId"
+               asp-route-semana="@Model.InicioSemana.AddDays(-7).ToString("yyyy-MM-dd")">←</a>
+        }
+        else
+        {
+            <span class="inactivo">←</span>
+        }
+        <strong>@Model.InicioSemana.ToString("d MMM", cultura) - @fin.ToString("d MMM yyyy", cultura)</strong>
+        <a asp-action="Disponibilidad" asp-route-id="@lab.LaboratorioId"
+           asp-route-semana="@Model.InicioSemana.AddDays(7).ToString("yyyy-MM-dd")">→</a>
+    </div>
+
+    <div class="leyenda">
+        <span><i class="punto libre"></i> Disponible</span>
+        <span><i class="punto ocupado"></i> No disponible</span>
+        <span><i class="punto elegido"></i> Seleccionado</span>
+    </div>
+
+    <div class="tabla-scroll">
+        <table class="tabla-disp">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    @foreach (var d in Model.Dias)
+                    {
+                        <th>@cultura.TextInfo.ToTitleCase(d.ToString("ddd", cultura))<small>@d.ToString("d MMM", cultura)</small></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var h in Model.Horas)
+                {
+                    <tr>
+                        <th>@h.ToString(@"hh\:mm") - @((h + TimeSpan.FromHours(1)).ToString(@"hh\:mm"))</th>
+                        @foreach (var d in Model.Dias)
+                        {
+                            var libre = Model.EstaLibre(d, h);
+                            <td>
+                                <button type="button"
+                                        class="celda @(libre ? "libre" : "ocupado")"
+                                        disabled="@(!libre)"
+                                        data-fecha="@d.ToString("yyyy-MM-dd")"
+                                        data-hora="@h.ToString(@"hh\:mm")"
+                                        aria-label="@(libre ? "Disponible" : "No disponible")">
+                                    @(libre ? "Disponible" : "No disponible")
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="resumen">
+        <p id="seleccion">Selecciona un horario disponible.</p>
+        <a id="btn-continuar" class="lab-boton deshabilitado" href="#">Continuar con la reserva</a>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const resumen = document.getElementById('seleccion');
+        const continuar = document.getElementById('btn-continuar');
+        let elegido = null;
+
+        document.querySelectorAll('.celda.libre').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (elegido) elegido.classList.remove('elegido');
+                elegido = btn;
+                btn.classList.add('elegido');
+                resumen.textContent = `Seleccionado: ${btn.dataset.fecha} a las ${btn.dataset.hora}`;
+                continuar.classList.remove('deshabilitado');
+                // TODO: apuntar a la pantalla de crear reserva con fecha y hora
+                continuar.href = '#';
+            });
+        });
+    </script>
+}
