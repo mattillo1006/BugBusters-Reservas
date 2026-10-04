@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
             .FirstOrDefaultAsync(u => u.NombreUsuario == request.NombreUsuario);
 
         // Caso negativo: usuario no existe o contraseña incorrecta
-        if (usuario is null || usuario.Contraseña != request.Password)
+        if (usuario is null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Contraseña))
         {
             return Unauthorized(new { mensaje = "Credenciales incorrectas." });
         }

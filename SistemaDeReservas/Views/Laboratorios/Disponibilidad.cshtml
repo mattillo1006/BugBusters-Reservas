@@ -40,7 +40,7 @@
 
     <div class="leyenda">
         <span><i class="punto libre"></i> Disponible</span>
-        <span><i class="punto ocupado"></i> No disponible</span>
+        <span><i class="punto ocupado"></i> Ocupado</span>
         <span><i class="punto elegido"></i> Seleccionado</span>
     </div>
 
@@ -70,7 +70,7 @@
                                         data-fecha="@d.ToString("yyyy-MM-dd")"
                                         data-hora="@h.ToString(@"hh\:mm")"
                                         aria-label="@(libre ? "Disponible" : "No disponible")">
-                                    @(libre ? "Disponible" : "No disponible")
+                                    @(libre ? "Disponible" : "Ocupado")
                                 </button>
                             </td>
                         }

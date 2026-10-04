@@ -122,5 +122,26 @@ namespace WebAPI.Controllers
                 Mensaje = "El laboratorio se encuentra disponible."
             });
         }
+
+        // GET: api/Laboratorios/1/reservas?desde=2026-10-05&hasta=2026-10-09
+        [HttpGet("{id}/reservas")]
+        public async Task<ActionResult<IEnumerable<ReservaOcupadaResponse>>> GetReservasRango(
+            int id, [FromQuery] DateTime desde, [FromQuery] DateTime hasta)
+        {
+            var reservas = await _context.Reservas
+                .Where(r => r.LaboratorioId == id
+                         && r.Estado == "Activa"
+                         && r.Fecha >= desde.Date
+                         && r.Fecha <= hasta.Date)
+                .Select(r => new ReservaOcupadaResponse
+                {
+                    Fecha = r.Fecha,
+                    HoraInicio = r.HoraInicio,
+                    HoraFin = r.HoraFin
+                })
+                .ToListAsync();
+
+            return Ok(reservas);
+        }
     }
 }

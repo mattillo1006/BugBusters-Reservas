@@ -64,9 +64,24 @@ namespace SistemaDeReservas.Controllers
             for (var h = apertura; h + TimeSpan.FromHours(1) <= cierre; h += TimeSpan.FromHours(1))
                 vm.Horas.Add(h);
 
-            // TODO: cuando existan reservas, llenar vm.Ocupados aquí
+            try
+            {
+                var respRes = await client.GetAsync(
+                    $"api/Laboratorios/{id}/reservas?desde={lunes:yyyy-MM-dd}&hasta={lunes.AddDays(4):yyyy-MM-dd}");
+
+                if (respRes.IsSuccessStatusCode)
+                {
+                    var reservas = await respRes.Content.ReadFromJsonAsync<List<ReservaOcupada>>() ?? new();
+                    foreach (var r in reservas)
+                        for (var h = r.HoraInicio; h < r.HoraFin; h += TimeSpan.FromHours(1))
+                            vm.Ocupados.Add((r.Fecha.Date, h));
+                }
+            }
+            catch (HttpRequestException) { /* si falla, se muestra todo libre */ }
 
             return View(vm);
         }
     }
 }
+
+public record ReservaOcupada(DateTime Fecha, TimeSpan HoraInicio, TimeSpan HoraFin);
