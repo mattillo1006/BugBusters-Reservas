@@ -8,7 +8,7 @@ using SistemaDeReservas.Models;
 
 namespace SistemaDeReservas.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _factory;
