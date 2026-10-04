@@ -80,16 +80,12 @@
         </table>
     </div>
 
-    <div class="resumen">
-        <p id="seleccion">Selecciona un horario disponible.</p>
-        <a id="btn-continuar" class="lab-boton deshabilitado" href="#">Continuar con la reserva</a>
-    </div>
+    <p id="seleccion" class="seleccion">Selecciona un horario disponible.</p>
 </section>
 
 @section Scripts {
     <script>
         const resumen = document.getElementById('seleccion');
-        const continuar = document.getElementById('btn-continuar');
         let elegido = null;
 
         document.querySelectorAll('.celda.libre').forEach(btn => {
@@ -98,9 +94,6 @@
                 elegido = btn;
                 btn.classList.add('elegido');
                 resumen.textContent = `Seleccionado: ${btn.dataset.fecha} a las ${btn.dataset.hora}`;
-                continuar.classList.remove('deshabilitado');
-                // TODO: apuntar a la pantalla de crear reserva con fecha y hora
-                continuar.href = '#';
             });
         });
     </script>

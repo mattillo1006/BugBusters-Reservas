@@ -1,27 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SistemaDeReservas.Models;
 
 namespace SistemaDeReservas.Controllers
 {
-    // [Authorize]  // TODO: reactivar login
+    //[Authorize]
     public class LaboratoriosController : Controller
     {
-        // TODO: reemplazar por llamadas a la WebAPI
-        private static readonly List<Laboratorio> Demo = new()
-        {
-            new() { LaboratorioId = 1, Nombre = "Laboratorio de Química", Ubicacion = "Edificio A, piso 1", Capacidad = 30, Estado = "Disponible" },
-            new() { LaboratorioId = 2, Nombre = "Laboratorio de Física", Ubicacion = "Edificio A, piso 2", Capacidad = 25, Estado = "Disponible" },
-            new() { LaboratorioId = 3, Nombre = "Laboratorio de Cómputo", Ubicacion = "Edificio B, piso 1", Capacidad = 40, Estado = "FueraDeServicio" },
-            new() { LaboratorioId = 4, Nombre = "Laboratorio de Biología", Ubicacion = "Edificio C, piso 1", Capacidad = 20, Estado = "Disponible" }
-        };
+        private readonly IHttpClientFactory _factory;
+        public LaboratoriosController(IHttpClientFactory factory) => _factory = factory;
 
-        public IActionResult Disponibilidad(int id, DateTime? semana)
+        public async Task<IActionResult> Disponibilidad(int id, DateTime? semana)
         {
-            var lab = Demo.FirstOrDefault(l => l.LaboratorioId == id);
+            var client = _factory.CreateClient("WebAPI");
+
+            Laboratorio? lab;
+            try
+            {
+                var resp = await client.GetAsync($"api/Laboratorios/{id}");
+                if (resp.StatusCode == HttpStatusCode.NotFound) return NotFound();
+                if (resp.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return RedirectToAction("Login", "Account");
+                }
+                resp.EnsureSuccessStatusCode();
+                lab = await resp.Content.ReadFromJsonAsync<Laboratorio>();
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = "No se pudo conectar con el servidor.";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (lab is null) return NotFound();
-
-            var apertura = TimeSpan.FromHours(7);
-            var cierre = TimeSpan.FromHours(17);
 
             // Lunes de la semana pedida (si hoy es fin de semana, arranca el lunes siguiente)
             var hoy = DateTime.Today;
@@ -31,6 +46,10 @@ namespace SistemaDeReservas.Controllers
             var lunes = (semana ?? primerLunes).Date;
             lunes = lunes.AddDays(-(((int)lunes.DayOfWeek + 6) % 7));
             if (lunes < primerLunes) lunes = primerLunes;
+
+            var apertura = lab.HoraApertura;
+            var cierre = lab.HoraCierre;
+            if (cierre <= apertura) { apertura = TimeSpan.FromHours(7); cierre = TimeSpan.FromHours(17); }
 
             var vm = new DisponibilidadViewModel
             {
@@ -42,14 +61,10 @@ namespace SistemaDeReservas.Controllers
                 Dias = Enumerable.Range(0, 5).Select(i => lunes.AddDays(i)).ToList()
             };
 
-            for (var h = apertura; h < cierre; h += TimeSpan.FromHours(1))
+            for (var h = apertura; h + TimeSpan.FromHours(1) <= cierre; h += TimeSpan.FromHours(1))
                 vm.Horas.Add(h);
 
-            // Reservas de ejemplo (patrón fijo para poder ver verdes y rojos)
-            foreach (var dia in vm.Dias)
-                foreach (var h in vm.Horas)
-                    if ((dia.Day + (int)h.TotalHours + id) % 4 == 0)
-                        vm.Ocupados.Add((dia, h));
+            // TODO: cuando existan reservas, llenar vm.Ocupados aquí
 
             return View(vm);
         }

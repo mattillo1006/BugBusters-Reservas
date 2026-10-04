@@ -1,8 +1,86 @@
-﻿@{
-    ViewData["Title"] = "Login";
+﻿@model IEnumerable<SistemaDeReservas.Models.Laboratorio>
+@{
+    ViewData["Title"] = "Laboratorios";
+    var error = ViewData["Error"] as string ?? TempData["Error"] as string;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Pagina de Inicio sin crear</h1>
-    <p>Este apartado esta en contruccion de la futura pagina Principal para el sistema de reservas</p>
+<section class="encabezado">
+    <div>
+        <h1>Laboratorios</h1>
+        <p>Selecciona un laboratorio para ver su disponibilidad.</p>
+    </div>
+
+    <div class="herramientas">
+        <input id="buscador" type="search" placeholder="Buscar laboratorio..." />
+        <div class="vista-botones" role="group" aria-label="Tipo de vista">
+            <button type="button" id="btn-cartas" class="activo" title="Cartas">▦</button>
+            <button type="button" id="btn-lista" title="Lista">☰</button>
+        </div>
+    </div>
+</section>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="aviso aviso-error">⚠️ @error</div>
+}
+
+<div id="laboratorios" class="laboratorios">
+    @foreach (var lab in Model)
+    {
+        <article class="lab-carta" data-nombre="@lab.Nombre.ToLower()">
+            <div class="lab-imagen">
+                <span class="lab-estado @(lab.Disponible ? "ok" : "no")">
+                    @(lab.Disponible ? "Disponible" : "Fuera de servicio")
+                </span>
+            </div>
+
+            <div class="lab-cuerpo">
+                <h2>@lab.Nombre</h2>
+                <ul class="lab-datos">
+                    <li>📍 @lab.Ubicacion</li>
+                    <li>👥 @lab.Capacidad personas</li>
+                    <li>🕒 @lab.HoraApertura.ToString(@"hh\:mm") - @lab.HoraCierre.ToString(@"hh\:mm")</li>
+                </ul>
+                <a class="lab-boton" asp-controller="Laboratorios" asp-action="Disponibilidad"
+                   asp-route-id="@lab.LaboratorioId">Ver disponibilidad</a>
+            </div>
+        </article>
+    }
 </div>
+
+@if (!Model.Any() && string.IsNullOrEmpty(error))
+{
+    <p class="sin-resultados">No hay laboratorios registrados.</p>
+}
+<p id="sin-resultados" class="sin-resultados" hidden>No se encontraron laboratorios.</p>
+
+@section Scripts {
+    <script>
+        const contenedor = document.getElementById('laboratorios');
+        const btnCartas = document.getElementById('btn-cartas');
+        const btnLista = document.getElementById('btn-lista');
+
+        function setVista(lista) {
+            contenedor.classList.toggle('vista-lista', lista);
+            btnLista.classList.toggle('activo', lista);
+            btnCartas.classList.toggle('activo', !lista);
+            try { localStorage.setItem('vistaLab', lista ? 'lista' : 'cartas'); } catch (e) { }
+        }
+        btnCartas.onclick = () => setVista(false);
+        btnLista.onclick = () => setVista(true);
+        let guardada = null;
+        try { guardada = localStorage.getItem('vistaLab'); } catch (e) { }
+        setVista(guardada === 'lista');
+
+        document.getElementById('buscador').addEventListener('input', e => {
+            const q = e.target.value.trim().toLowerCase();
+            let visibles = 0;
+            document.querySelectorAll('.lab-carta').forEach(c => {
+                const coincide = c.dataset.nombre.includes(q);
+                c.hidden = !coincide;
+                if (coincide) visibles++;
+            });
+            document.getElementById('sin-resultados').hidden = visibles > 0;
+        });
+    </script>
+}
