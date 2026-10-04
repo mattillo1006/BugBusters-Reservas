@@ -413,6 +413,31 @@ body {
     }
 }
 
+/* ---------- Vista Disponibilidad: textos legibles sobre el fondo azul ---------- */
+.volver,
+.volver:visited,
+.info-lab h1,
+.info-lab li,
+.info-lab strong,
+.semana-nav,
+.semana-nav a,
+.semana-nav a:visited,
+.leyenda,
+.tabla-disp th,
+.tabla-disp th small,
+.seleccion {
+    color: #ffffff;
+}
+
+    .semana-nav .inactivo {
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .volver:hover,
+    .semana-nav a:hover {
+        color: var(--color-focus); /* naranja del tema al pasar el mouse */
+    }
+
 @media (prefers-reduced-motion: reduce) {
     .lab-carta, .lab-carta:hover {
         animation: none;

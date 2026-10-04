@@ -16,9 +16,9 @@
         </span>
     </div>
     <ul>
-        <li><strong>📍 Ubicación</strong>@lab.Ubicacion</li>
-        <li><strong>👥 Capacidad</strong>@lab.Capacidad personas</li>
-        <li><strong>🕒 Horario</strong>@Model.HoraApertura.ToString(@"hh\:mm") - @Model.HoraCierre.ToString(@"hh\:mm")</li>
+        <li><strong>Ubicación:</strong> @lab.Ubicacion</li>
+        <li><strong>Capacidad:</strong> @lab.Capacidad personas</li>
+        <li><strong>Horario:</strong> @Model.HoraApertura.ToString(@"hh\:mm") - @Model.HoraCierre.ToString(@"hh\:mm")</li>
     </ul>
 </section>
 
@@ -88,12 +88,21 @@
         const resumen = document.getElementById('seleccion');
         let elegido = null;
 
+        // "08:00" -> "09:00"
+        function sumarHora(hhmm) {
+            const [h, m] = hhmm.split(':').map(Number);
+            return `${String((h + 1) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
         document.querySelectorAll('.celda.libre').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (elegido) elegido.classList.remove('elegido');
                 elegido = btn;
                 btn.classList.add('elegido');
-                resumen.textContent = `Seleccionado: ${btn.dataset.fecha} a las ${btn.dataset.hora}`;
+
+                const inicio = btn.dataset.hora;
+                const fin = sumarHora(inicio);
+                resumen.textContent = `Seleccionado: ${btn.dataset.fecha} desde ${inicio} hasta ${fin}`;
             });
         });
     </script>

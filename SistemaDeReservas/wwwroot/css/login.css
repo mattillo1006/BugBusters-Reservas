@@ -393,3 +393,37 @@ body {
         opacity: .7;
     }
 }
+
+.input-password {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+    .input-password input {
+        padding-right: 50px;
+    }
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    background: none;
+    border: 0;
+    color: #6b7794;
+    cursor: pointer;
+    transition: color .2s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+    .toggle-password:hover {
+        color: var(--color-focus);
+    }
+
+
+.input-password:focus-within .toggle-password {
+    transform: translateY(calc(-50% - 2px));
+}
