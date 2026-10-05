@@ -2,6 +2,12 @@
 @{
     ViewData["Title"] = "Laboratorios";
     var error = ViewData["Error"] as string ?? TempData["Error"] as string;
+    var imagenes = new Dictionary<int, string>
+    {
+        [1] = "Laboratorio-computo.jpg",
+        [2] = "Laboratorio-Redes.jpg",
+        [3] = "Laboratorio_de_electronica.jpg"
+    };
 }
 
 <section class="encabezado">
@@ -27,12 +33,16 @@
 <div id="laboratorios" class="laboratorios">
     @foreach (var lab in Model)
     {
-        <article class="lab-carta" data-nombre="@lab.Nombre.ToLower()">
-            <div class="lab-imagen">
-                <span class="lab-estado @(lab.Disponible ? "ok" : "no")">
-                    @(lab.Disponible ? "Disponible" : "Fuera de servicio")
-                </span>
-            </div>
+    var img = imagenes.TryGetValue(lab.LaboratorioId, out var archivo)
+        ? Url.Content("~/img/" + archivo)
+        : null;
+
+    <article class="lab-carta" data-nombre="@lab.Nombre.ToLower()">
+        <div class="lab-imagen" style="@(img is not null ? $"background-image:url('{img}')" : "")">
+            <span class="lab-estado @(lab.Disponible ? "ok" : "no")">
+                @(lab.Disponible ? "Disponible" : "Fuera de servicio")
+            </span>
+        </div>
 
             <div class="lab-cuerpo">
                 <h2>@lab.Nombre</h2>
