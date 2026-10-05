@@ -29,8 +29,10 @@ namespace WebAPI.Controllers
                 Nombre = l.Nombre,
                 Ubicacion = l.Ubicacion,
                 Capacidad = l.Capacidad,
-                Estado = l.Estado
-            }).ToListAsync();
+                Estado = l.Estado,
+                HoraApertura = l.HoraApertura,
+                HoraCierre = l.HoraCierre
+                }).ToListAsync();
             return Ok(laboratorios);
         }
 
@@ -46,7 +48,9 @@ namespace WebAPI.Controllers
                               Nombre= l.Nombre,
                               Ubicacion= l.Ubicacion,
                               Capacidad= l.Capacidad,
-                              Estado= l.Estado
+                              Estado= l.Estado,
+                              HoraApertura = l.HoraApertura,
+                              HoraCierre = l.HoraCierre
                               }).FirstOrDefaultAsync();
 
             if (laboratorio is null)

@@ -37,12 +37,19 @@
             <div class="lab-cuerpo">
                 <h2>@lab.Nombre</h2>
                 <ul class="lab-datos">
-                    <li>📍 @lab.Ubicacion</li>
-                    <li>👥 @lab.Capacidad personas</li>
-                    <li>🕒 @lab.HoraApertura.ToString(@"hh\:mm") - @lab.HoraCierre.ToString(@"hh\:mm")</li>
+                    <li>@lab.Ubicacion</li>
+                    <li>@lab.Capacidad personas</li>
+                    <li>@lab.HoraApertura.ToString(@"hh\:mm") - @lab.HoraCierre.ToString(@"hh\:mm")</li>
                 </ul>
-                <a class="lab-boton" asp-controller="Laboratorios" asp-action="Disponibilidad"
-                   asp-route-id="@lab.LaboratorioId">Ver disponibilidad</a>
+                @if (lab.Disponible)
+                {
+                    <a class="lab-boton" asp-controller="Laboratorios" asp-action="Disponibilidad"
+                       asp-route-id="@lab.LaboratorioId">Ver disponibilidad</a>
+                }
+                else
+                {
+                    <span class="lab-boton deshabilitado" aria-disabled="true">No disponible</span>
+                }
             </div>
         </article>
     }

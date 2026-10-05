@@ -6,8 +6,9 @@
         public string Nombre { get; set; } = string.Empty;
         public string Ubicacion { get; set; } = string.Empty;
         public int Capacidad { get; set; }
-        public bool Disponible { get; set; }
+        public string Estado { get; set; } = string.Empty;
         public TimeSpan HoraApertura { get; set; }
         public TimeSpan HoraCierre { get; set; }
+        public bool Disponible => Estado == "Habilitado";
     }
 }

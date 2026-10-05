@@ -37,6 +37,11 @@ namespace SistemaDeReservas.Controllers
             }
 
             if (lab is null) return NotFound();
+            if (!lab.Disponible)
+            {
+                TempData["Error"] = $"El laboratorio {lab.Nombre} se encuentra fuera de servicio.";
+                return RedirectToAction("Index", "Home");
+            }
 
             // Lunes de la semana pedida (si hoy es fin de semana, arranca el lunes siguiente)
             var hoy = DateTime.Today;
