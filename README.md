@@ -562,7 +562,8 @@ Las pruebas se ejecutan contra el API (desde Scalar) y desde el Front-End para a
 | **Precondición**       | Igual que HU3-1 (reserva activa de 09:00 a 11:00 en Lab Computo 1).                                                  |
 | **Entrada**            | `GET /api/Laboratorios/1/disponibilidad?fecha=2026-10-15&horaInicio=11:00&horaFin=13:00`                             |
 | **Resultado esperado** | `200 OK` con `disponible = true`.                                                                                    |
-| **Resultado obtenido** | _Pendiente de ejecutar y registrar._                                                                                 |
+| **Resultado obtenido** | "disponible": true,
+  "mensaje": "El laboratorio se encuentra disponible."                                                                                 |
 
 #### Caso HU3-3 — Positivo: una reserva cancelada no afecta la disponibilidad
 Igual que la siguiente prueba, se tienen que incluir datos para poder probar esto.
@@ -573,10 +574,11 @@ Igual que la siguiente prueba, se tienen que incluir datos para poder probar est
 | **Precondición**       | Datos de prueba cargados; Lab Redes tiene una reserva **cancelada** el 2026-10-15 de 10:00 a 12:00. |
 | **Entrada**            |                                                                                                     |
 | **Resultado esperado** | `200 OK` con `disponible = true`.                                                                   |
-| **Resultado obtenido** | _Pendiente de ejecutar y registrar._                                                                |
+| **Resultado obtenido** | "disponible": true,
+  "mensaje": "El laboratorio se encuentra disponible."                                                                |
 
 #### Caso HU3-4 — Negativo: horario ocupado por una reserva activa
-Este hay que verificar, porque el dato semilla de la BD esta en una fecha pasada, por lo que el Scalar dispara el error por fecha.
+
 
 | Campo                  | Detalle                                                                                                                   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -584,7 +586,8 @@ Este hay que verificar, porque el dato semilla de la BD esta en una fecha pasada
 | **Precondición**       | Datos de prueba cargados; Lab Computo 1 tiene una reserva activa el 2026-10-15 de 09:00 a 11:00.                          |
 | **Entrada**            |                                                                                                                           |
 | **Resultado esperado** | `200 OK` con `{ "disponible": false, "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado." }`. |
-| **Resultado obtenido** | _Pendiente de ejecutar y registrar._                                                                                      |
+| **Resultado obtenido** |  "disponible": false,
+  "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado."                                                                                      |
 
 #### Caso HU3-5 — Negativo: laboratorio fuera de servicio
 
