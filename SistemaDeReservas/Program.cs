@@ -20,7 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         o.LoginPath = "/Account/Login";
         o.AccessDeniedPath = "/Account/Login";
-        o.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        o.ExpireTimeSpan = TimeSpan.FromMinutes(25);
         o.SlidingExpiration = true;
         o.Cookie.HttpOnly = true;
         o.Cookie.SameSite = SameSiteMode.Strict;
