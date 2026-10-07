@@ -74,6 +74,17 @@ body {
         flex-direction: column;
     }
 
+
+    /* ---------- Logo UTN (Dentro del Section (login-Form) ---------- */
+    .Utn-image {
+        height: 150px;
+        max-width: 100%;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        border-radius: 50px
+        
+    }
+
 /* ---------- Campos ---------- */
 .campo {
     display: flex;
