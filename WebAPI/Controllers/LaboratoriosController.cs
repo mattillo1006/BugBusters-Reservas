@@ -91,6 +91,11 @@ namespace WebAPI.Controllers
             if (horaInicio < laboratorio.HoraApertura || horaFin > laboratorio.HoraCierre)
             {
                 return BadRequest(new { mensaje = $"El laboratorio solo opera entre {laboratorio.HoraApertura} y {laboratorio.HoraCierre}." });
+
+            }
+            if (horaFin - horaInicio > TimeSpan.FromHours(4))
+            {
+                return BadRequest(new { mensaje = "Una reserva no puede superar las 4 horas." });
             }
 
             // Laboratorio fuera de servicio nunca está disponible
