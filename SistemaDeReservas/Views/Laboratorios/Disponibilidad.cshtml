@@ -4,10 +4,19 @@
     var lab = Model.Laboratorio;
     var cultura = new System.Globalization.CultureInfo("es-CR");
     var fin = Model.InicioSemana.AddDays(4);
+    var usuario = User.Identity?.Name ?? "";
+    var nombreCompleto = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? usuario;
 }
 
 <a class="volver" asp-controller="Home" asp-action="Index">← Volver a laboratorios</a>
-
+@if (TempData["Exito"] is string exito)
+{
+    <div class="aviso aviso-ok" role="status"> @exito</div>
+}
+@if (TempData["Error"] is string error)
+{
+    <div class="aviso aviso-error" role="alert"> @error</div>
+}
 <section class="info-lab">
     <div>
         <h1>@lab.Nombre</h1>
@@ -44,54 +53,120 @@
         <span><i class="punto elegido"></i> Seleccionado</span>
     </div>
 
-    <div class="tabla-scroll">
-        <table class="tabla-disp">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    @foreach (var d in Model.Dias)
-                    {
-                        <th>@cultura.TextInfo.ToTitleCase(d.ToString("ddd", cultura))<small>@d.ToString("d MMM", cultura)</small></th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var h in Model.Horas)
-                {
+    <div class="disp-layout">
+        <div class="tabla-scroll">
+            <table class="tabla-disp">
+                <thead>
                     <tr>
-                        <th>@h.ToString(@"hh\:mm") - @((h + TimeSpan.FromHours(1)).ToString(@"hh\:mm"))</th>
+                        <th>Hora</th>
                         @foreach (var d in Model.Dias)
                         {
-                            var libre = Model.EstaLibre(d, h);
-                            <td>
-                                <button type="button"
-                                        class="celda @(libre ? "libre" : "ocupado")"
-                                        disabled="@(!libre)"
-                                        data-fecha="@d.ToString("yyyy-MM-dd")"
-                                        data-hora="@h.ToString(@"hh\:mm")"
-                                        aria-label="@(libre ? "Disponible" : "No disponible")">
-                                    @(libre ? "Disponible" : "Ocupado")
-                                </button>
-                            </td>
+                            <th>@cultura.TextInfo.ToTitleCase(d.ToString("ddd", cultura))<small>@d.ToString("d MMM", cultura)</small></th>
                         }
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var h in Model.Horas)
+                    {
+                        <tr>
+                            <th>@h.ToString(@"hh\:mm") - @((h + TimeSpan.FromHours(1)).ToString(@"hh\:mm"))</th>
+                            @foreach (var d in Model.Dias)
+                            {
+                                var libre = Model.EstaLibre(d, h);
+                                <td>
+                                    <button type="button"
+                                            class="celda @(libre ? "libre" : "ocupado")"
+                                            disabled="@(!libre)"
+                                            data-fecha="@d.ToString("yyyy-MM-dd")"
+                                            data-hora="@h.ToString(@"hh\:mm")"
+                                            aria-label="@(libre ? "Disponible" : "No disponible")">
+                                        @(libre ? "Disponible" : "Ocupado")
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+         <aside class="panel-reserva">
+        <h2>Resumen de la reserva</h2>
+
+        <form id="formReserva" asp-controller="Reservas" asp-action="Crear" method="post"
+              data-cierre="@Model.HoraCierre.ToString(@"hh\:mm")">
+            <input type="hidden" name="laboratorioId" value="@lab.LaboratorioId" />
+            <input type="hidden" name="semana" value="@Model.InicioSemana.ToString("yyyy-MM-dd")" />
+            <input type="hidden" id="fecha" name="fecha" />
+            <input type="hidden" id="horaInicio" name="horaInicio" />
+
+            <dl class="reserva-datos">
+                <dt>Responsable</dt>
+                <dd>@nombreCompleto <small>(@usuario)</small></dd>
+
+                <dt>Laboratorio</dt>
+                <dd>@lab.Nombre</dd>
+
+                <dt>Fecha</dt>
+                <dd id="resFecha">—</dd>
+
+                <dt>Hora de inicio</dt>
+                <dd id="resInicio">—</dd>
+
+                <dt><label for="horaFin">Hora de finalización</label></dt>
+                <dd><select id="horaFin" name="horaFin" disabled></select></dd>
+
+                <dt>Duración</dt>
+                <dd id="resDuracion">—</dd>
+            </dl>
+
+            <p class="reserva-nota">Duración máxima: 4 horas.</p>
+            <p id="seleccion" class="reserva-vacio">Selecciona un horario disponible en la tabla.</p>
+
+            <button type="submit" id="btnReservar" class="btn-reservar" disabled>Reservar</button>
+        </form>
+    </aside>
     </div>
 
-    <p id="seleccion" class="seleccion">Selecciona un horario disponible.</p>
-</section>
 
+</section>
 @section Scripts {
     <script>
-        const resumen = document.getElementById('seleccion');
+        const form = document.getElementById('formReserva');
+        const inFecha = document.getElementById('fecha');
+        const inInicio = document.getElementById('horaInicio');
+        const selFin = document.getElementById('horaFin');
+        const btnReservar = document.getElementById('btnReservar');
+        const resFecha = document.getElementById('resFecha');
+        const resInicio = document.getElementById('resInicio');
+        const resDuracion = document.getElementById('resDuracion');
+        const vacio = document.getElementById('seleccion');
+        const MAX_HORAS = 4;
         let elegido = null;
 
-        // "08:00" -> "09:00"
-        function sumarHora(hhmm) {
-            const [h, m] = hhmm.split(':').map(Number);
-            return `${String((h + 1) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        const aMin = hhmm => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+        const aHHMM = min => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+
+        function fechaLegible(iso) {
+            const [y, m, d] = iso.split('-').map(Number);
+            const texto = new Date(y, m - 1, d).toLocaleDateString('es-CR',
+                { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        }
+
+        
+        function llenarHoraFin(inicio) {
+            selFin.innerHTML = '';
+            const ini = aMin(inicio);
+            const tope = Math.min(ini + MAX_HORAS * 60, aMin(form.dataset.cierre));
+            for (let m = ini + 60; m <= tope; m += 60) {
+                selFin.add(new Option(aHHMM(m), aHHMM(m)));
+            }
+        }
+
+        function actualizarDuracion() {
+            const horas = (aMin(selFin.value) - aMin(inInicio.value)) / 60;
+            resDuracion.textContent = horas === 1 ? '1 hora' : `${horas} horas`;
         }
 
         document.querySelectorAll('.celda.libre').forEach(btn => {
@@ -100,10 +175,20 @@
                 elegido = btn;
                 btn.classList.add('elegido');
 
-                const inicio = btn.dataset.hora;
-                const fin = sumarHora(inicio);
-                resumen.textContent = `Seleccionado: ${btn.dataset.fecha} desde ${inicio} hasta ${fin}`;
+                inFecha.value = btn.dataset.fecha;
+                inInicio.value = btn.dataset.hora;
+                resFecha.textContent = fechaLegible(btn.dataset.fecha);
+                resInicio.textContent = btn.dataset.hora;
+
+                llenarHoraFin(btn.dataset.hora);
+                actualizarDuracion();
+
+                selFin.disabled = false;
+                btnReservar.disabled = false;
+                vacio.hidden = true;
             });
         });
+
+        selFin.addEventListener('change', actualizarDuracion);
     </script>
 }
