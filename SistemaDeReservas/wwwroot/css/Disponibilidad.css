@@ -1,0 +1,463 @@
+﻿/* ==========================================================
+   Disponibilidad de laboratorio - Sistema de Reservas
+   Ubicación sugerida: wwwroot/css/disponibilidad.css
+   ========================================================== */
+
+:root {
+    --color-primario: #1d4ed8;
+    --color-primario-oscuro: #1e3a8a;
+    --color-fondo: #f3f5f9;
+    --color-superficie: #ffffff;
+    --color-borde: #dde2ec;
+    --color-texto: #1f2937;
+    --color-texto-suave: #6b7280;
+    --color-gris-oscuro: #374151;
+    --color-libre: #16a34a;
+    --color-libre-fondo: #dcfce7;
+    --color-ocupado: #dc2626;
+    --color-ocupado-fondo: #fee2e2;
+    --color-elegido: #1d4ed8;
+    --color-elegido-fondo: #dbeafe;
+    --radio: 12px;
+    --sombra: 0 2px 10px rgba(15, 23, 42, 0.08);
+}
+
+body {
+    background: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+}
+
+/* Márgenes laterales más pequeños: ensancha el contenedor del layout */
+.container,
+.container-lg,
+.container-xl,
+.container-xxl,
+main[role="main"] {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+/* ---------- Enlace volver ---------- */
+.volver {
+    display: inline-block;
+    margin: 0.5rem 0 1rem;
+    color: var(--color-primario);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .volver:hover {
+        text-decoration: underline;
+    }
+
+/* ---------- Avisos ---------- */
+.aviso {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.aviso-ok {
+    background: var(--color-libre-fondo);
+    color: #166534;
+    border-color: #86efac;
+}
+
+.aviso-error {
+    background: var(--color-ocupado-fondo);
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+
+/* ---------- Información del laboratorio ---------- */
+.info-lab {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-superficie);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+    .info-lab h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.6rem;
+        color: var(--color-gris-oscuro);
+    }
+
+    .info-lab ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        color: var(--color-gris-oscuro);
+    }
+
+    .info-lab li strong {
+        color: var(--color-gris-oscuro);
+    }
+
+.lab-estado {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+    .lab-estado.ok {
+        background: var(--color-libre-fondo);
+        color: #166534;
+    }
+
+    .lab-estado.no {
+        background: var(--color-ocupado-fondo);
+        color: #991b1b;
+    }
+
+/* ---------- Panel principal ---------- */
+.panel-tabla {
+    background: var(--color-superficie);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 1.25rem;
+}
+
+/* ---------- Navegación de semana ---------- */
+.semana-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+    .semana-nav strong {
+        color: var(--color-gris-oscuro);
+    }
+
+    .semana-nav a,
+    .semana-nav .inactivo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        border: 1px solid var(--color-borde);
+        text-decoration: none;
+        font-size: 1.1rem;
+    }
+
+    .semana-nav a {
+        color: var(--color-primario);
+        background: var(--color-superficie);
+        transition: background 0.15s, color 0.15s;
+    }
+
+        .semana-nav a:hover {
+            background: var(--color-primario);
+            color: #fff;
+        }
+
+    .semana-nav .inactivo {
+        color: #c3c9d6;
+        background: #f3f4f6;
+        cursor: not-allowed;
+    }
+
+/* ---------- Leyenda ---------- */
+.leyenda {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--color-texto-suave);
+}
+
+    .leyenda span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+.punto {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 50%;
+}
+
+    .punto.libre {
+        background: var(--color-libre);
+    }
+
+    .punto.ocupado {
+        background: var(--color-ocupado);
+    }
+
+    .punto.elegido {
+        background: var(--color-elegido);
+    }
+
+/* ---------- Layout tabla + resumen ---------- */
+.disp-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--color-borde);
+    border-radius: 10px;
+}
+
+/* ---------- Tabla ---------- */
+.tabla-disp {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+}
+
+    .tabla-disp th,
+    .tabla-disp td {
+        border: 1px solid var(--color-borde);
+        padding: 0.35rem;
+        text-align: center;
+    }
+
+    .tabla-disp thead th {
+        background: var(--color-primario-oscuro);
+        color: #fff;
+        padding: 0.6rem 0.4rem;
+        font-weight: 600;
+    }
+
+        .tabla-disp thead th small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+    .tabla-disp tbody th {
+        background: #f8fafc;
+        color: var(--color-texto-suave);
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        padding: 0.4rem 0.6rem;
+    }
+
+/* ---------- Celdas ---------- */
+.celda {
+    width: 100%;
+    padding: 0.6rem 0.25rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
+}
+
+    .celda.libre {
+        background: var(--color-libre-fondo);
+        color: #166534;
+        cursor: pointer;
+    }
+
+        .celda.libre:hover {
+            background: #bbf7d0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+        }
+
+    .celda.ocupado {
+        background: var(--color-ocupado-fondo);
+        color: #991b1b;
+        cursor: not-allowed;
+        opacity: 0.75;
+    }
+
+    .celda.elegido,
+    .celda.libre.elegido {
+        background: var(--color-elegido);
+        color: #fff;
+        border-color: var(--color-primario-oscuro);
+        box-shadow: 0 2px 8px rgba(29, 78, 216, 0.4);
+    }
+
+    .celda:focus-visible,
+    .btn-reservar:focus-visible,
+    #horaFin:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+/* ---------- Panel de reserva ---------- */
+.panel-reserva {
+    background: #f8fafc;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    padding: 2rem;
+    position: sticky;
+    top: 1rem;
+}
+
+    .panel-reserva h2 {
+        margin: 0 0 1.25rem;
+        font-size: 1.4rem;
+        color: var(--color-primario-oscuro);
+    }
+
+.reserva-datos {
+    margin: 0 0 1rem;
+}
+
+    .reserva-datos dt {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-gris-oscuro);
+        margin-top: 1rem;
+    }
+
+    .reserva-datos dd {
+        margin: 0.25rem 0 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-gris-oscuro);
+    }
+
+        .reserva-datos dd small {
+            font-weight: 400;
+            color: var(--color-gris-oscuro);
+        }
+
+    .reserva-datos label {
+        cursor: pointer;
+    }
+
+#horaFin {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-gris-oscuro);
+    font-family: inherit;
+    font-size: 1.05rem;
+}
+
+    #horaFin:disabled {
+        background: #eef0f4;
+        color: #9ca3af;
+    }
+
+.reserva-nota {
+    font-size: 0.9rem;
+    color: var(--color-texto-suave);
+    margin: 0 0 0.75rem;
+}
+
+.reserva-vacio {
+    font-size: 1rem;
+    color: var(--color-texto-suave);
+    background: #fff;
+    border: 1px dashed var(--color-borde);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin: 0 0 1.25rem;
+}
+
+    .reserva-vacio[hidden] {
+        display: none;
+    }
+
+.btn-reservar {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+    .btn-reservar:hover:not(:disabled) {
+        background: var(--color-primario-oscuro);
+        transform: translateY(-1px);
+    }
+
+    .btn-reservar:disabled {
+        background: #c3c9d6;
+        cursor: not-allowed;
+    }
+
+/* ---------- Correcciones de contraste ----------
+   Fuerzan el color en elementos que el layout podría pintar de blanco. */
+.volver,
+.volver:visited {
+    color: var(--color-primario) !important;
+}
+
+.info-lab li,
+.info-lab li span,
+.info-lab li strong {
+    color: var(--color-gris-oscuro) !important;
+}
+
+.info-lab .lab-estado.ok {
+    background: var(--color-libre-fondo) !important;
+    color: #166534 !important;
+}
+
+.info-lab .lab-estado.no {
+    background: var(--color-ocupado-fondo) !important;
+    color: #991b1b !important;
+}
+
+.semana-nav strong,
+.panel-tabla .leyenda span {
+    color: var(--color-gris-oscuro) !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .disp-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-reserva {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .panel-tabla {
+        padding: 1rem;
+    }
+
+    .info-lab {
+        padding: 1rem;
+    }
+}
