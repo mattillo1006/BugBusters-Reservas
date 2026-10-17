@@ -1,0 +1,312 @@
+﻿/* ==========================================================
+   Mis reservas - Sistema de Reservas
+   Ubicación: wwwroot/css/mis-reservas.css
+   Todo está acotado bajo .mr para no afectar a otras páginas.
+   ========================================================== */
+
+.mr {
+    --mr-texto: #374151;
+    --mr-texto-suave: #6b7280;
+    --mr-titulo: #1e3a8a;
+    --mr-primario: #1e3a8a;
+    --mr-primario-hover: #172c6b;
+    --mr-borde: #dde2ec;
+    --mr-fondo-fila: #f8fafc;
+    background: #fff;
+    color: var(--mr-texto);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+    padding: 1.5rem;
+}
+
+/* ---------- Encabezado ---------- */
+.mr-encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+    .mr-encabezado h1 {
+        margin: 0 0 0.25rem;
+        font-size: 1.7rem;
+        color: var(--mr-titulo);
+    }
+
+    .mr-encabezado p {
+        margin: 0;
+        color: var(--mr-texto);
+    }
+
+.mr-boton,
+.mr-boton:visited {
+    display: inline-block;
+    padding: 0.7rem 1.25rem;
+    border-radius: 8px;
+    background: var(--mr-primario);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.1s;
+}
+
+    .mr-boton:hover {
+        background: var(--mr-primario-hover);
+        transform: translateY(-1px);
+    }
+
+/* ---------- Avisos ---------- */
+.mr-aviso {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.mr-aviso-ok {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+}
+
+.mr-aviso-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+
+/* ---------- Pestañas ---------- */
+.mr-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--mr-borde);
+}
+
+    .mr-tabs a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.1rem;
+        margin-bottom: -2px;
+        border-bottom: 3px solid transparent;
+        color: var(--mr-texto);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+        .mr-tabs a:hover {
+            background: var(--mr-fondo-fila);
+        }
+
+        .mr-tabs a.activo {
+            color: var(--mr-primario);
+            border-bottom-color: var(--mr-primario);
+        }
+
+.mr-contador {
+    min-width: 1.6rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: #e5e7eb;
+    color: var(--mr-texto);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.mr-tabs a.activo .mr-contador {
+    background: var(--mr-primario);
+    color: #fff;
+}
+
+/* ---------- Tabla ---------- */
+.mr-tabla-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--mr-borde);
+    border-radius: 10px;
+}
+
+.mr-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .mr-tabla th,
+    .mr-tabla td {
+        padding: 0.85rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--mr-borde);
+        color: var(--mr-texto);
+        vertical-align: middle;
+    }
+
+    .mr-tabla thead th {
+        background: var(--mr-primario);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .mr-tabla tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .mr-tabla tbody tr:nth-child(even) {
+        background: var(--mr-fondo-fila);
+    }
+
+    .mr-tabla tbody tr:hover {
+        background: #eef2ff;
+    }
+
+    .mr-tabla td strong {
+        display: block;
+        color: var(--mr-texto);
+    }
+
+    .mr-tabla td small {
+        display: block;
+        margin-top: 0.15rem;
+        color: var(--mr-texto-suave);
+        font-size: 0.85rem;
+    }
+
+/* ---------- Estado ---------- */
+.mr-estado {
+    display: inline-block;
+    padding: 0.25rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mr-estado-proxima {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.mr-estado-encurso {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.mr-estado-finalizada {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.mr-estado-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ---------- Sin reservas ---------- */
+.mr-vacio {
+    padding: 2.5rem 1rem;
+    border: 2px dashed var(--mr-borde);
+    border-radius: 10px;
+    text-align: center;
+    color: var(--mr-texto);
+}
+
+    .mr-vacio p {
+        margin: 0 0 0.5rem;
+    }
+
+.mr-vacio-titulo {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.mr-vacio .mr-boton {
+    margin-top: 0.75rem;
+}
+
+/* ---------- Foco visible ---------- */
+.mr a:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+/* ---------- Móvil: cada fila se convierte en una tarjeta ---------- */
+@media (max-width: 700px) {
+    .mr {
+        padding: 1rem;
+    }
+
+    .mr-tabla-scroll {
+        border: none;
+        overflow: visible;
+    }
+
+    .mr-tabla thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .mr-tabla,
+    .mr-tabla tbody,
+    .mr-tabla tr,
+    .mr-tabla td {
+        display: block;
+        width: 100%;
+    }
+
+        .mr-tabla tbody tr,
+        .mr-tabla tbody tr:nth-child(even) {
+            margin-bottom: 0.9rem;
+            background: #fff;
+            border: 1px solid var(--mr-borde);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .mr-tabla td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 0.9rem;
+            text-align: right;
+        }
+
+            .mr-tabla td::before {
+                content: attr(data-label);
+                flex-shrink: 0;
+                color: var(--mr-texto-suave);
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            /* El laboratorio hace de título de la tarjeta */
+            .mr-tabla td:first-child {
+                display: block;
+                text-align: left;
+                background: var(--mr-fondo-fila);
+            }
+
+                .mr-tabla td:first-child::before {
+                    display: none;
+                }
+
+        .mr-tabla tbody tr:last-child td {
+            border-bottom: 1px solid var(--mr-borde);
+        }
+
+        .mr-tabla td:last-child {
+            border-bottom: none !important;
+        }
+}

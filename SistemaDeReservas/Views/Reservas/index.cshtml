@@ -1,0 +1,110 @@
+﻿@model SistemaDeReservas.Models.MisReservasViewModel
+@{
+    ViewData["Title"] = "Mis reservas";
+    var cultura = new System.Globalization.CultureInfo("es-CR");
+    var nombreCompleto = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
+                         ?? User.Identity?.Name ?? "";
+    var enHistorial = Model.Filtro == MisReservasViewModel.FiltroHistorial;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/mis-reservas.css" asp-append-version="true" />
+}
+
+<section class="mr">
+    <header class="mr-encabezado">
+        <div>
+            <h1>Mis reservas</h1>
+            <p>Reservas a nombre de <strong>@nombreCompleto</strong></p>
+        </div>
+        <a class="mr-boton" asp-controller="Home" asp-action="Index">+ Nueva reserva</a>
+    </header>
+
+    @if (TempData["Exito"] is string exito)
+    {
+        <div class="mr-aviso mr-aviso-ok" role="status">@exito</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="mr-aviso mr-aviso-error" role="alert">@error</div>
+    }
+    @if (ViewData["Error"] is string errorCarga)
+    {
+        <div class="mr-aviso mr-aviso-error" role="alert">@errorCarga</div>
+    }
+
+    <nav class="mr-tabs" aria-label="Filtrar reservas">
+        <a asp-action="Index" asp-route-filtro="@MisReservasViewModel.FiltroProximas"
+           class="@(enHistorial ? "" : "activo")"
+           aria-current="@(enHistorial ? null : "page")">
+            Próximas <span class="mr-contador">@Model.Proximas.Count</span>
+        </a>
+        <a asp-action="Index" asp-route-filtro="@MisReservasViewModel.FiltroHistorial"
+           class="@(enHistorial ? "activo" : "")"
+           aria-current="@(enHistorial ? "page" : null)">
+            Historial <span class="mr-contador">@Model.Historial.Count</span>
+        </a>
+    </nav>
+
+    @if (Model.Mostradas.Count == 0)
+    {
+        <div class="mr-vacio">
+            @if (enHistorial)
+            {
+                <p class="mr-vacio-titulo">Todavía no tienes reservas pasadas ni canceladas.</p>
+                <p>Cuando termine alguna de tus reservas, aparecerá aquí.</p>
+            }
+            else
+            {
+                <p class="mr-vacio-titulo">No tienes reservas próximas.</p>
+                <p>Elige un laboratorio y reserva el horario que necesites.</p>
+                <a class="mr-boton" asp-controller="Home" asp-action="Index">Ver laboratorios</a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="mr-tabla-scroll">
+            <table class="mr-tabla">
+                <thead>
+                    <tr>
+                        <th scope="col">Laboratorio</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Horario</th>
+                        <th scope="col">Duración</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Mostradas)
+                    {
+                        var (textoEstado, claseEstado) = r.ObtenerEstado(Model.Ahora) switch
+                        {
+                            EstadoReserva.EnCurso => ("En curso", "encurso"),
+                            EstadoReserva.Proxima => ("Próxima", "proxima"),
+                            EstadoReserva.Cancelada => ("Cancelada", "cancelada"),
+                            _ => ("Finalizada", "finalizada")
+                        };
+                        var dia = cultura.TextInfo.ToTitleCase(r.Fecha.ToString("ddd", cultura));
+                        var horasTexto = r.Horas.ToString("0.##", cultura);
+                        var duracion = r.Horas == 1 ? "1 hora" : horasTexto + " horas";
+
+                        <tr>
+                            <td data-label="Laboratorio">
+                                <strong>@r.Laboratorio</strong>
+                                @if (!string.IsNullOrWhiteSpace(r.Ubicacion))
+                                {
+                                    <small>@r.Ubicacion</small>
+                                }
+                            </td>
+                            <td data-label="Fecha">@dia @r.Fecha.ToString("d MMM yyyy", cultura)</td>
+                            <td data-label="Horario">@r.HoraInicio.ToString(@"hh\:mm") - @r.HoraFin.ToString(@"hh\:mm")</td>
+                            <td data-label="Duración">@duracion</td>
+                            <td data-label="Estado"><span class="mr-estado mr-estado-@claseEstado">@textoEstado</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

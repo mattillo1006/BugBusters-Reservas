@@ -19,15 +19,44 @@ namespace WebAPI.Controllers
 
         public ReservasController(ReservasDBContext context) => _context = context;
 
+        // GET: api/Reservas/mias
+        // Devuelve todas las reservas del usuario autenticado (el id sale del token, nunca de la URL)
+        [HttpGet("mias")]
+        public async Task<ActionResult<IEnumerable<MiReservaResponse>>> GetMias()
+        {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
+                return Unauthorized();
+
+            var reservas = await (
+                from r in _context.Reservas
+                join l in _context.Laboratorios on r.LaboratorioId equals l.LaboratorioId
+                where r.UsuarioId == usuarioId && r.Active
+                orderby r.Fecha descending, r.HoraInicio descending
+                select new MiReservaResponse
+                {
+                    ReservaId = r.ReservaId,
+                    LaboratorioId = r.LaboratorioId,
+                    Laboratorio = l.Nombre,
+                    Ubicacion = l.Ubicacion,
+                    Fecha = r.Fecha,
+                    HoraInicio = r.HoraInicio,
+                    HoraFin = r.HoraFin,
+                    Estado = r.Estado,
+                    FechaRegistro = r.FechaRegistro
+                }).ToListAsync();
+
+            return Ok(reservas);
+        }
+
         // POST: api/Reservas
         [HttpPost]
         public async Task<ActionResult<ReservaResponse>> Crear([FromBody] CrearReservaRequest request)
         {
-            
+
             if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
                 return Unauthorized();
 
-            
+
             var faltantes = new List<string>();
             if (request.LaboratorioId is null or <= 0) faltantes.Add("el laboratorio");
             if (request.Fecha is null) faltantes.Add("la fecha");
@@ -48,7 +77,7 @@ namespace WebAPI.Controllers
             if (laboratorio is null)
                 return NotFound(new { mensaje = "Laboratorio no encontrado." });
 
-            
+
             var errores = new List<string>();
 
             if (fin <= inicio)
@@ -66,7 +95,7 @@ namespace WebAPI.Controllers
             if (errores.Count > 0)
                 return BadRequest(new { mensaje = string.Join(" ", errores), errores });
 
-            
+
             if (laboratorio.Estado == "FueraDeServicio")
                 return Conflict(new { mensaje = "El laboratorio se encuentra fuera de servicio." });
 
