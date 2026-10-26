@@ -1,23 +1,35 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
   vmImage: 'ubuntu-latest'
 
-
 variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet restore
-  displayName: 'Restaurar NuGets'
+- task: UseDotNet@2
+  displayName: 'Instalar SDK .NET 10'
+  inputs:
+    packageType: 'sdk'
+    version: '10.x'
+
 - task: DotNetCoreCLI@2
+  displayName: 'Restaurar NuGets'
+  inputs:
+    command: 'restore'
+    projects: '**/*.sln'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Compilar'
   inputs:
     command: 'build'
-    projects: '**/*.csproj'
-    arguments: --configuration build
+    projects: '**/*.sln'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Ejecutar pruebas'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build'
