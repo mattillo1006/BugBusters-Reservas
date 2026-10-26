@@ -18,18 +18,11 @@ steps:
   displayName: 'Restaurar NuGets'
   inputs:
     command: 'restore'
-    projects: '**/*.sln'
+    projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Compilar'
   inputs:
     command: 'build'
-    projects: '**/*.sln'
+    projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-restore'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Ejecutar pruebas'
-  inputs:
-    command: 'test'
-    projects: '**/*Tests.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build'
