@@ -14,7 +14,8 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-
+- script: dotnet restore
+  displayName: 'Restaurar NuGets'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
