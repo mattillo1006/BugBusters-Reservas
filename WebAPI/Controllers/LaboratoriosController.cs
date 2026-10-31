@@ -152,5 +152,40 @@ namespace WebAPI.Controllers
 
             return Ok(reservas);
         }
+
+        // PUT: api/Laboratorios/5/estado
+        [HttpPut("{id}/estado")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> CambiarEstado(int id, [FromBody] CambiarEstadoRequest request)
+        {
+            var estadosValidos = new[] { "Habilitado", "FueraDeServicio" };
+
+            if (request.Estado is null || !estadosValidos.Contains(request.Estado))
+                return BadRequest(new { mensaje = "El estado debe ser 'Habilitado' o 'FueraDeServicio'." });
+
+            var laboratorio = await _context.Laboratorios
+                .FirstOrDefaultAsync(l => l.LaboratorioId == id && l.Active);
+
+            if (laboratorio is null)
+                return NotFound(new { mensaje = "Laboratorio no encontrado." });
+
+            if (laboratorio.Estado == request.Estado)
+                return Conflict(new { mensaje = $"El laboratorio ya se encuentra en estado '{request.Estado}'." });
+
+            laboratorio.Estado = request.Estado;
+            await _context.SaveChangesAsync();
+
+            return Ok(new LaboratorioResponse
+            {
+                LaboratorioId = laboratorio.LaboratorioId,
+                Nombre = laboratorio.Nombre,
+                Ubicacion = laboratorio.Ubicacion,
+                Capacidad = laboratorio.Capacidad,
+                Estado = laboratorio.Estado,
+                HoraApertura = laboratorio.HoraApertura,
+                HoraCierre = laboratorio.HoraCierre
+            });
+        }
+
     }
 }

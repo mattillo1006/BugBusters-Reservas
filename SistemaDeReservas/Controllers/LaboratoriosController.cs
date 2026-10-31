@@ -86,6 +86,46 @@ namespace SistemaDeReservas.Controllers
 
             return View(vm);
         }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CambiarEstado(int id, string estado, int? laboratorioOrigenId, DateTime? semana)
+        {
+            var client = _factory.CreateClient("WebAPI");
+
+            try
+            {
+                var response = await client.PutAsJsonAsync($"api/Laboratorios/{id}/estado", new { estado });
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return RedirectToAction("Login", "Account");
+                }
+
+                if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    TempData["Error"] = "No tienes permisos para cambiar el estado de este laboratorio.";
+                }
+                else if (response.IsSuccessStatusCode)
+                {
+                    TempData["Exito"] = "El estado del laboratorio se actualizó correctamente.";
+                }
+                else
+                {
+                    TempData["Error"] = $"La WebAPI respondió {(int)response.StatusCode} al cambiar el estado.";
+                }
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = "No se pudo conectar con el servidor.";
+            }
+
+            return RedirectToAction("Disponibilidad", new { id = laboratorioOrigenId ?? id, semana = semana?.ToString("yyyy-MM-dd") });
+        }
+
     }
 }
 
