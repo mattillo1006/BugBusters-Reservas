@@ -26,3 +26,22 @@ steps:
     command: 'build'
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: Ejecutar pruebas
+  inputs:
+    command: test
+    projects: WebApi_Test/WebApi_Test.csproj
+    arguments: >
+      --configuration $(buildConfiguration)
+      --no-build
+      --results-directory $(Agent.TempDirectory)/TestResults
+      -- --report-trx --report-trx-filename resultados.trx
+
+- task: PublishTestResults@2
+  displayName: Publicar resultados de pruebas
+  condition: always()
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '$(Agent.TempDirectory)/TestResults/**/*.trx'
+    failTaskOnFailedTests: true
