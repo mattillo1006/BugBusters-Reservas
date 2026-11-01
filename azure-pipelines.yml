@@ -31,6 +31,7 @@ steps:
   displayName: Ejecutar pruebas
   inputs:
     command: test
+    publishTestResults: false
     projects: WebApi_Test/WebApi_Test.csproj
     arguments: >
       --configuration $(buildConfiguration)
