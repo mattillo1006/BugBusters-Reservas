@@ -32,7 +32,7 @@ namespace WebApi_Test
             };
 
             context.Roles.Add(rol);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var usuario = new Usuario
             {
@@ -47,7 +47,7 @@ namespace WebApi_Test
             };
 
             context.Usuarios.Add(usuario);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
@@ -180,7 +180,7 @@ namespace WebApi_Test
             };
 
             context.Roles.Add(rol);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var usuario = new Usuario
             {
@@ -195,7 +195,7 @@ namespace WebApi_Test
             };
 
             context.Usuarios.Add(usuario);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
@@ -247,7 +247,7 @@ namespace WebApi_Test
             };
 
             context.Roles.Add(rol);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var usuario = new Usuario
             {
@@ -263,7 +263,7 @@ namespace WebApi_Test
             };
 
             context.Usuarios.Add(usuario);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
@@ -310,7 +310,7 @@ namespace WebApi_Test
             };
 
             context.Roles.Add(rol);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var usuario = new Usuario
             {
@@ -326,7 +326,7 @@ namespace WebApi_Test
             };
 
             context.Usuarios.Add(usuario);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
