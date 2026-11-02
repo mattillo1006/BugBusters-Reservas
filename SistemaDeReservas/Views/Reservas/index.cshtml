@@ -49,15 +49,14 @@
     @if (Model.Mostradas.Count == 0)
     {
         <div class="mr-vacio">
+            <p class="mr-vacio-titulo">No hay actualizaciones.</p>
             @if (enHistorial)
             {
-                <p class="mr-vacio-titulo">Todavía no tienes reservas pasadas ni canceladas.</p>
-                <p>Cuando termine alguna de tus reservas, aparecerá aquí.</p>
+                <p>Cuando alguna reserva finalice o se cancele, aparecerá aquí.</p>
             }
             else
             {
-                <p class="mr-vacio-titulo">No tienes reservas próximas.</p>
-                <p>Elige un laboratorio y reserva el horario que necesites.</p>
+                <p>No tienes reservas próximas. Elige un laboratorio y reserva el horario que necesites.</p>
                 <a class="mr-boton" asp-controller="Home" asp-action="Index">Ver laboratorios</a>
             }
         </div>
@@ -73,6 +72,10 @@
                         <th scope="col">Horario</th>
                         <th scope="col">Duración</th>
                         <th scope="col">Estado</th>
+                        @if (!enHistorial)
+                        {
+                            <th scope="col">Acciones</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -101,6 +104,29 @@
                             <td data-label="Horario">@r.HoraInicio.ToString(@"hh\:mm") - @r.HoraFin.ToString(@"hh\:mm")</td>
                             <td data-label="Duración">@duracion</td>
                             <td data-label="Estado"><span class="mr-estado mr-estado-@claseEstado">@textoEstado</span></td>
+                            @if (!enHistorial)
+                            {
+                                <td data-label="Acciones">
+                                    @if (r.PuedeCancelar(Model.Ahora))
+                                    {
+                                        <details class="mr-cancelar">
+                                            <summary>Cancelar</summary>
+                                            <form asp-action="Cancelar" method="post" class="mr-cancelar-form">
+                                                <input type="hidden" name="id" value="@r.ReservaId" />
+                                                <input type="hidden" name="filtro" value="@Model.Filtro" />
+                                                <p>¿Cancelar la reserva de <strong>@r.Laboratorio</strong> del @r.Fecha.ToString("d MMM", cultura) a las @(r.HoraInicio.ToString(@"hh\:mm"))?</p>
+                                                <label for="motivo-@r.ReservaId">Motivo (opcional)</label>
+                                                <input id="motivo-@r.ReservaId" name="motivo" type="text" maxlength="255" autocomplete="off" />
+                                                <button type="submit" class="mr-boton-peligro">Sí, cancelar reserva</button>
+                                            </form>
+                                        </details>
+                                    }
+                                    else
+                                    {
+                                        <span class="mr-sin-accion" title="Una reserva en curso ya no se puede cancelar">&mdash;</span>
+                                    }
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

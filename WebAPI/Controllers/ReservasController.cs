@@ -15,6 +15,7 @@ namespace WebAPI.Controllers
     public class ReservasController : ControllerBase
     {
         private const int DuracionMaximaHoras = 4;
+        private const int MotivoMaximoCaracteres = 255;
         private readonly ReservasDBContext _context;
 
         public ReservasController(ReservasDBContext context) => _context = context;
@@ -139,6 +140,66 @@ namespace WebAPI.Controllers
                 FinReserva = reserva.HoraFin,
                 Estado = reserva.Estado,
                 Mensaje = "Reserva registrada correctamente."
+            });
+        }
+
+        // POST: api/Reservas/{id}/cancelar
+        // Cancela una reserva propia que todavía no ha iniciado. El id del usuario sale del token.
+        // Deja Reservas.Estado = "Cancelada" (libera el horario) y registra la cancelación en Cancelaciones.
+        [HttpPost("{id:int}/cancelar")]
+        public async Task<ActionResult<CancelarReservaResponse>> Cancelar(int id, [FromBody] CancelarReservaRequest? request = null)
+        {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
+                return Unauthorized();
+
+            var motivo = request?.Motivo?.Trim();
+            if (string.IsNullOrEmpty(motivo)) motivo = null;
+
+            if (motivo is { Length: > MotivoMaximoCaracteres })
+                return BadRequest(new { mensaje = $"El motivo no puede superar los {MotivoMaximoCaracteres} caracteres." });
+
+            var reserva = await _context.Reservas
+                .FirstOrDefaultAsync(r => r.ReservaId == id && r.Active);
+
+            // Si la reserva es de otra persona se responde igual que si no existiera,
+            // para no revelar qué ids existen
+            if (reserva is null || reserva.UsuarioId != usuarioId)
+                return NotFound(new { mensaje = "Reserva no encontrada." });
+
+            if (reserva.Estado != "Activa")
+                return Conflict(new { mensaje = "La reserva ya se encuentra cancelada." });
+
+            var ahora = DateTime.Now;
+            if (reserva.Fecha.Date + reserva.HoraInicio <= ahora)
+                return Conflict(new { mensaje = "No se puede cancelar una reserva que ya inició o finalizó." });
+
+            reserva.Estado = "Cancelada";
+
+            // Hay un único registro por reserva (UQ_Can_Reserva): si ya existía uno
+            // (p. ej. datos semilla) se actualiza en lugar de insertar otro
+            var cancelacion = await _context.Cancelaciones
+                .FirstOrDefaultAsync(c => c.ReservaId == reserva.ReservaId);
+
+            if (cancelacion is null)
+            {
+                cancelacion = new Cancelacion { ReservaId = reserva.ReservaId };
+                _context.Cancelaciones.Add(cancelacion);
+            }
+
+            cancelacion.CanceladaPorId = usuarioId;
+            cancelacion.FechaCancelacion = ahora;
+            cancelacion.Motivo = motivo;
+            cancelacion.Active = true;
+
+            // Un solo SaveChanges: el cambio de estado y el registro se guardan juntos o no se guardan
+            await _context.SaveChangesAsync();
+
+            return Ok(new CancelarReservaResponse
+            {
+                ReservaId = reserva.ReservaId,
+                Estado = reserva.Estado,
+                FechaCancelacion = cancelacion.FechaCancelacion,
+                Mensaje = "Reserva cancelada correctamente."
             });
         }
     }

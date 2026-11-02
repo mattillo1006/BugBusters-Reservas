@@ -26,6 +26,9 @@
         public double Horas => (HoraFin - HoraInicio).TotalHours;
         public bool EstaActiva => string.Equals(Estado, "Activa", StringComparison.OrdinalIgnoreCase);
 
+        // Solo se puede cancelar una reserva activa que todavía no ha iniciado
+        public bool PuedeCancelar(DateTime ahora) => EstaActiva && Inicio > ahora;
+
         // La BD solo guarda Activa/Cancelada; "próxima", "en curso" y "finalizada" se deducen de la hora
         public EstadoReserva ObtenerEstado(DateTime ahora)
         {

@@ -13,6 +13,8 @@ namespace WebAPI.Data
         public DbSet<Laboratorio> Laboratorios  { get; set; }
         public DbSet<Reserva> Reservas { get; set; }
 
+        public DbSet<Cancelacion> Cancelaciones { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //mapear las tablas de la BD para asegurarnos que sean iguales segun la entidad
@@ -24,7 +26,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<Usuario>().HasOne(u => u.Rol).WithMany().HasForeignKey(u => u.RolId);
 
             modelBuilder.Entity<Usuario>().Property(u => u.Contraseña).HasColumnName("Contraseña");
-
+            modelBuilder.Entity<Cancelacion>().ToTable("Cancelaciones");
         }
     }
 }

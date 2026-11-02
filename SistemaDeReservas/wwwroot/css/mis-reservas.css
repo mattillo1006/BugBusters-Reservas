@@ -230,6 +230,82 @@
     margin-top: 0.75rem;
 }
 
+/* ---------- Cancelar reserva ---------- */
+.mr-cancelar summary {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    background: #fff;
+    color: #991b1b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    transition: background 0.15s;
+}
+
+    .mr-cancelar summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .mr-cancelar summary:hover {
+        background: #fee2e2;
+    }
+
+.mr-cancelar[open] summary {
+    background: #fee2e2;
+}
+
+.mr-cancelar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 15rem;
+    margin-top: 0.6rem;
+    padding: 0.8rem;
+    border: 1px solid var(--mr-borde);
+    border-radius: 8px;
+    background: #fff;
+    text-align: left;
+}
+
+    .mr-cancelar-form p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .mr-cancelar-form label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--mr-texto-suave);
+    }
+
+    .mr-cancelar-form input[type="text"] {
+        padding: 0.4rem 0.6rem;
+        border: 1px solid var(--mr-borde);
+        border-radius: 6px;
+    }
+
+.mr-boton-peligro {
+    padding: 0.5rem 0.9rem;
+    border: none;
+    border-radius: 8px;
+    background: #b91c1c;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+    .mr-boton-peligro:hover {
+        background: #991b1b;
+    }
+
+.mr-sin-accion {
+    color: var(--mr-texto-suave);
+}
+
 /* ---------- Foco visible ---------- */
 .mr a:focus-visible {
     outline: 3px solid #93c5fd;
@@ -292,7 +368,7 @@
             }
 
             /* El laboratorio hace de título de la tarjeta */
-            .mr-tabla td:first-child {
+            .mr-tabla td:first-child {F
                 display: block;
                 text-align: left;
                 background: var(--mr-fondo-fila);

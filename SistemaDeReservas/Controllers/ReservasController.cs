@@ -112,6 +112,50 @@ namespace SistemaDeReservas.Controllers
             return RedirectToAction("Disponibilidad", "Laboratorios",
                 new { id = laboratorioId, semana = semana?.ToString("yyyy-MM-dd") });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancelar(int id, string? motivo, string? filtro)
+        {
+            var client = _factory.CreateClient("WebAPI");
+
+            try
+            {
+                var response = await client.PostAsJsonAsync($"api/Reservas/{id}/cancelar", new { motivo });
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return RedirectToAction("Login", "Account");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var ok = await response.Content.ReadFromJsonAsync<RespuestaApi>();
+                    TempData["Exito"] = ok?.Mensaje ?? "Reserva cancelada correctamente.";
+                }
+                else
+                {
+                    string? mensaje = null;
+                    try
+                    {
+                        mensaje = (await response.Content.ReadFromJsonAsync<RespuestaApi>())?.Mensaje;
+                    }
+                    catch (JsonException) { }
+
+                    TempData["Error"] = mensaje ?? "No se pudo cancelar la reserva.";
+                }
+            }
+            catch (HttpRequestException)
+            {
+                TempData["Error"] = "No se pudo conectar con el servidor.";
+            }
+
+            var filtroValido = string.Equals(filtro, MisReservasViewModel.FiltroHistorial, StringComparison.OrdinalIgnoreCase)
+                ? MisReservasViewModel.FiltroHistorial
+                : MisReservasViewModel.FiltroProximas;
+            return RedirectToAction(nameof(Index), new { filtro = filtroValido });
+        }
     }
 
     public record RespuestaApi(string? Mensaje);
