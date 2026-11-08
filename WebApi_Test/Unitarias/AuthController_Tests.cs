@@ -9,7 +9,7 @@ using WebAPI.Models;
 using BCrypt.Net;
 using Xunit;
 
-namespace WebApi_Test
+namespace WebApi_Test.Pruebas_Unitarias
 {
     // Las pruebas en este caso estaran hechas 
     // en base al controlador encargado de manejar
