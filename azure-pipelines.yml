@@ -1,9 +1,6 @@
 # Pipeline de CI - BugBusters-Reservas
 # Compila, ejecuta las pruebas con cobertura y publica el análisis en SonarQube Cloud.
 
-checkout: self
-fetchDepth: 0        # clona el historial completo; evita el warning de Sonar por "shallow clone"
-
 # Se ejecuta automáticamente con cada commit/push a main
 trigger:
 - main
@@ -17,6 +14,8 @@ variables:
   testResultsDir: '$(Agent.TempDirectory)/TestResults'
 
 steps:
+- checkout: self
+  fetchDepth: 0          # clona el historial completo; evita el warning de Sonar por "shallow clone"
 - task: UseDotNet@2
   displayName: 'Instalar SDK .NET 10'
   inputs:
