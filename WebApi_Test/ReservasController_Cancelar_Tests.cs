@@ -50,7 +50,7 @@ namespace WebApi_Test
                 Active = true
             };
             context.Laboratorios.Add(laboratorio);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var reserva = new Reserva
             {
@@ -64,7 +64,7 @@ namespace WebApi_Test
                 Active = true
             };
             context.Reservas.Add(reserva);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
             return reserva;
         }
 
@@ -83,9 +83,9 @@ namespace WebApi_Test
             var body = Assert.IsType<CancelarReservaResponse>(ok.Value);
             Assert.Equal("Cancelada", body.Estado);
 
-            Assert.Equal("Cancelada", (await context.Reservas.SingleAsync()).Estado);
+            Assert.Equal("Cancelada", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
 
-            var cancelacion = await context.Cancelaciones.SingleAsync();
+            var cancelacion = await context.Cancelaciones.SingleAsync(cancellationToken: TestContext.Current.CancellationToken);
             Assert.Equal(reserva.ReservaId, cancelacion.ReservaId);
             Assert.Equal(1, cancelacion.CanceladaPorId);
             Assert.Equal("No puedo asistir", cancelacion.Motivo);
@@ -101,7 +101,7 @@ namespace WebApi_Test
             var result = await controller.Cancelar(reserva.ReservaId, null);
 
             Assert.IsType<OkObjectResult>(result.Result);
-            Assert.Null((await context.Cancelaciones.SingleAsync()).Motivo);
+            Assert.Null((await context.Cancelaciones.SingleAsync(TestContext.Current.CancellationToken)).Motivo);
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace WebApi_Test
             var result = await controller.Cancelar(reserva.ReservaId, null);
 
             Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal("Activa", (await context.Reservas.SingleAsync()).Estado);
+            Assert.Equal("Activa", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
             Assert.Empty(context.Cancelaciones);
         }
 
@@ -151,7 +151,7 @@ namespace WebApi_Test
             var result = await controller.Cancelar(reserva.ReservaId, null);
 
             Assert.IsType<ConflictObjectResult>(result.Result);
-            Assert.Equal("Activa", (await context.Reservas.SingleAsync()).Estado);
+            Assert.Equal("Activa", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace WebApi_Test
             var result = await controller.Cancelar(reserva.ReservaId, new CancelarReservaRequest { Motivo = new string('a', 256) });
 
             Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal("Activa", (await context.Reservas.SingleAsync()).Estado);
+            Assert.Equal("Activa", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
         }
 
         [Fact]
