@@ -433,3 +433,9 @@ FodyWeavers.xsd
 **/TestResults/
 **/CoverageReport/
 
+
+# SonarQube / SonarScanner generated files
+.sonarqube/
+**/.sonarqube/
+.sonar/
+.scannerwork/
