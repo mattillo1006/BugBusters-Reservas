@@ -1,6 +1,9 @@
 # Pipeline de CI - BugBusters-Reservas
 # Compila, ejecuta las pruebas con cobertura y publica el análisis en SonarQube Cloud.
 
+checkout: self
+fetchDepth: 0        # clona el historial completo; evita el warning de Sonar por "shallow clone"
+
 # Se ejecuta automáticamente con cada commit/push a main
 trigger:
 - main
@@ -23,7 +26,7 @@ steps:
 # --- SONAR 1/3: Prepare Analysis Configuration ---
 # Debe ir ANTES de compilar. Configura el scanner con la organización,
 # el proyecto y la ruta del reporte de cobertura que generan las pruebas.
-- task: SonarCloudPrepare@4
+- task: SonarCloudPrepare@4.3.1
   displayName: 'Sonar: Prepare Analysis Configuration'
   inputs:
     SonarQube: 'SonarCloud-Reservas'        # nombre de la service connection en Azure DevOps
@@ -79,12 +82,12 @@ steps:
 
 # --- SONAR 2/3: Run Code Analysis ---
 # Ejecuta el análisis y envía resultados y cobertura a SonarQube Cloud.
-- task: SonarCloudAnalyze@4
+- task: SonarCloudAnalyze@4.3.1
   displayName: 'Sonar: Run Code Analysis'
 
 # --- SONAR 3/3: Publish Quality Gate Result ---
 # Espera el resultado del Quality Gate y lo muestra en el resumen del pipeline.
-- task: SonarCloudPublish@4
+- task: SonarCloudPublish@4.3.1
   displayName: 'Sonar: Publish Quality Gate Result'
   inputs:
     pollingTimeoutSec: '300'
