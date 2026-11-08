@@ -1,3 +1,7 @@
+# Pipeline de CI - BugBusters-Reservas
+# Compila, ejecuta las pruebas con cobertura y publica el análisis en SonarQube Cloud.
+
+# Se ejecuta automáticamente con cada commit/push a main
 trigger:
 - main
 
@@ -6,6 +10,8 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  # Carpeta donde se guardan los resultados de pruebas y el reporte de cobertura
+  testResultsDir: '$(Agent.TempDirectory)/TestResults'
 
 steps:
 - task: UseDotNet@2
@@ -13,6 +19,23 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '10.x'
+
+# --- SONAR 1/3: Prepare Analysis Configuration ---
+# Debe ir ANTES de compilar. Configura el scanner con la organización,
+# el proyecto y la ruta del reporte de cobertura que generan las pruebas.
+- task: SonarCloudPrepare@4
+  displayName: 'Sonar: Prepare Analysis Configuration'
+  inputs:
+    SonarQube: 'SonarCloud-Reservas'        # nombre de la service connection en Azure DevOps
+    organization: 'mattillo1006'
+    scannerMode: 'dotnet'
+    projectKey: 'mattillo1006_BugBusters-Reservas'
+    projectName: 'BugBusters-Reservas'
+    extraProperties: |
+      # Se excluyen librerías de terceros y archivos generados para no contaminar el análisis
+      sonar.exclusions=**/wwwroot/lib/**,**/wwwroot/client/**,**/node_modules/**,**/.vs/**
+      # Reporte de cobertura (formato XML) generado por las pruebas
+      sonar.cs.vscoveragexml.reportsPaths=$(testResultsDir)/**/*.xml
 
 - task: DotNetCoreCLI@2
   displayName: 'Restaurar NuGets'
@@ -27,8 +50,9 @@ steps:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration) --no-restore'
 
+# Pruebas unitarias + cobertura. Deben correr ANTES de Run Code Analysis.
 - task: DotNetCoreCLI@2
-  displayName: Ejecutar pruebas
+  displayName: 'Ejecutar pruebas con cobertura'
   inputs:
     command: test
     publishTestResults: false
@@ -36,13 +60,31 @@ steps:
     arguments: >
       --configuration $(buildConfiguration)
       --no-build
-      --results-directory $(Agent.TempDirectory)/TestResults
+      --results-directory $(testResultsDir)
       -- --report-trx --report-trx-filename resultados.trx
+      --coverage --coverage-output-format xml --coverage-output coverage.xml
 
 - task: PublishTestResults@2
-  displayName: Publicar resultados de pruebas
+  displayName: 'Publicar resultados de pruebas'
   condition: always()
   inputs:
     testResultsFormat: VSTest
-    testResultsFiles: '$(Agent.TempDirectory)/TestResults/**/*.trx'
+    testResultsFiles: '$(testResultsDir)/**/*.trx'
     failTaskOnFailedTests: true
+
+# Diagnóstico: muestra qué archivos se generaron (se puede borrar al final)
+- script: find $(testResultsDir) -type f
+  displayName: 'Listar resultados y cobertura'
+  condition: always()
+
+# --- SONAR 2/3: Run Code Analysis ---
+# Ejecuta el análisis y envía resultados y cobertura a SonarQube Cloud.
+- task: SonarCloudAnalyze@4
+  displayName: 'Sonar: Run Code Analysis'
+
+# --- SONAR 3/3: Publish Quality Gate Result ---
+# Espera el resultado del Quality Gate y lo muestra en el resumen del pipeline.
+- task: SonarCloudPublish@4
+  displayName: 'Sonar: Publish Quality Gate Result'
+  inputs:
+    pollingTimeoutSec: '300'
