@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="../WebAPI/WebAPI.csproj" Id="2af16537-e720-4eb0-b247-ac9072c657b8" />
+  <Project Path="../WebApi_IntegrationTests/WebApi_IntegrationTests.csproj" Id="38f1be54-c523-43bd-ba82-e888b60e9445" />
   <Project Path="../WebApi_Test/WebApi_Test.csproj" Id="89c61a3e-3b7d-472d-8602-62a593d1d83d" />
   <Project Path="SistemaDeReservas.csproj" />
 </Solution>
