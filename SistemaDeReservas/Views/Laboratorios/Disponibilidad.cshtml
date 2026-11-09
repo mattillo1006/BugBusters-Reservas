@@ -6,6 +6,7 @@
     var fin = Model.InicioSemana.AddDays(4);
     var usuario = User.Identity?.Name ?? "";
     var nombreCompleto = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? usuario;
+    var ahora = DateTime.Now;
 }
 
 <a class="volver" asp-controller="Home" asp-action="Index">← Volver a laboratorios</a>
@@ -72,15 +73,17 @@
                             <th>@h.ToString(@"hh\:mm") - @((h + TimeSpan.FromHours(1)).ToString(@"hh\:mm"))</th>
                             @foreach (var d in Model.Dias)
                             {
-                                var libre = Model.EstaLibre(d, h);
+                                var pasado = d.Date < ahora.Date || (d.Date == ahora.Date && h < ahora.TimeOfDay);
+                                var libre = !pasado && Model.EstaLibre(d, h);
+                                var etiqueta = pasado ? "No disponible" : (libre ? "Disponible" : "Ocupado");
                                 <td>
                                     <button type="button"
                                             class="celda @(libre ? "libre" : "ocupado")"
                                             disabled="@(!libre)"
                                             data-fecha="@d.ToString("yyyy-MM-dd")"
                                             data-hora="@h.ToString(@"hh\:mm")"
-                                            aria-label="@(libre ? "Disponible" : "No disponible")">
-                                        @(libre ? "Disponible" : "Ocupado")
+                                            aria-label="@etiqueta">
+                                        @etiqueta
                                     </button>
                                 </td>
                             }

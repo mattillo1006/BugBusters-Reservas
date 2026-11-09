@@ -86,6 +86,8 @@ namespace WebAPI.Controllers
 
             if (fecha < DateTime.Today)
                 errores.Add("No se pueden realizar reservas en fechas anteriores a la fecha actual.");
+            else if (fecha == DateTime.Today && inicio < DateTime.Now.TimeOfDay)
+                errores.Add("No se pueden realizar reservas en una hora que ya pasó.");
 
             if (inicio < laboratorio.HoraApertura || fin > laboratorio.HoraCierre)
                 errores.Add($"El laboratorio solo puede reservarse entre {laboratorio.HoraApertura.ToString(@"hh\:mm")} y {laboratorio.HoraCierre.ToString(@"hh\:mm")}.");

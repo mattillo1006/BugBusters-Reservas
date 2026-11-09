@@ -76,6 +76,17 @@ namespace SistemaDeReservas.Controllers
         public async Task<IActionResult> Crear(int laboratorioId, DateTime? fecha,
             TimeSpan? horaInicio, TimeSpan? horaFin, DateTime? semana)
         {
+
+            var ahora = DateTime.Now;
+            if (fecha.HasValue &&
+                (fecha.Value.Date < ahora.Date ||
+                 (fecha.Value.Date == ahora.Date && horaInicio.HasValue && horaInicio.Value < ahora.TimeOfDay)))
+            {
+                TempData["Error"] = "No se pueden realizar reservas en una fecha u hora que ya pasó.";
+                return RedirectToAction("Disponibilidad", "Laboratorios",
+                    new { id = laboratorioId, semana = semana?.ToString("yyyy-MM-dd") });
+            }
+
             var client = _factory.CreateClient("WebAPI");
 
             try
