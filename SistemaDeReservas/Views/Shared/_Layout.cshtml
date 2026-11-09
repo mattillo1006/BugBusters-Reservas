@@ -31,8 +31,6 @@
                class="@(controlador == "Home" ? "activo" : "")">Home</a>
             <a asp-controller="Reservas" asp-action="Index"
                class="@(controlador == "Reservas" ? "activo" : "")">Mis reservas</a>
-            <a asp-controller="Account" asp-action="Index"
-               class="@(controlador == "Account" ? "activo" : "")">Cuenta</a>
 
             <form asp-controller="Account" asp-action="Logout" method="post" class="navbar-salir">
                 <button type="submit">Cerrar sesión</button>

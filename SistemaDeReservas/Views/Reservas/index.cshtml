@@ -20,6 +20,13 @@
         <a class="mr-boton" asp-controller="Home" asp-action="Index">+ Nueva reserva</a>
     </header>
 
+    @if (User.IsInRole("Administrador"))
+    {
+        <a class="mr-boton" asp-action="Index" asp-route-todas="@(!Model.Todas)" asp-route-filtro="@Model.Filtro">
+            @(Model.Todas ? "Ver solo las mías" : "Ver todas las reservas")
+        </a>
+    }
+
     @if (TempData["Exito"] is string exito)
     {
         <div class="mr-aviso mr-aviso-ok" role="status">@exito</div>

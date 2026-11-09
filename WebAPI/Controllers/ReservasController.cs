@@ -158,12 +158,14 @@ namespace WebAPI.Controllers
             if (motivo is { Length: > MotivoMaximoCaracteres })
                 return BadRequest(new { mensaje = $"El motivo no puede superar los {MotivoMaximoCaracteres} caracteres." });
 
+            var esAdmin = User.IsInRole("Administrador");
+
             var reserva = await _context.Reservas
                 .FirstOrDefaultAsync(r => r.ReservaId == id && r.Active);
 
-            // Si la reserva es de otra persona se responde igual que si no existiera,
-            // para no revelar qué ids existen
-            if (reserva is null || reserva.UsuarioId != usuarioId)
+            // Un usuario normal solo cancela las suyas (una ajena se responde como inexistente);
+            // el administrador puede cancelar cualquiera
+            if (reserva is null || (reserva.UsuarioId != usuarioId && !esAdmin))
                 return NotFound(new { mensaje = "Reserva no encontrada." });
 
             if (reserva.Estado != "Activa")
@@ -202,5 +204,34 @@ namespace WebAPI.Controllers
                 Mensaje = "Reserva cancelada correctamente."
             });
         }
+
+        // GET: api/Reservas/todas  (solo Administrador)
+        [HttpGet("todas")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<IEnumerable<MiReservaResponse>>> GetTodas()
+        {
+            var reservas = await (
+                from r in _context.Reservas
+                join l in _context.Laboratorios on r.LaboratorioId equals l.LaboratorioId
+                join u in _context.Usuarios on r.UsuarioId equals u.UsuarioId
+                where r.Active
+                orderby r.Fecha descending, r.HoraInicio descending
+                select new MiReservaResponse
+                {
+                    ReservaId = r.ReservaId,
+                    LaboratorioId = r.LaboratorioId,
+                    Laboratorio = l.Nombre,
+                    Ubicacion = l.Ubicacion,
+                    Fecha = r.Fecha,
+                    HoraInicio = r.HoraInicio,
+                    HoraFin = r.HoraFin,
+                    Estado = r.Estado,
+                    FechaRegistro = r.FechaRegistro,
+                    Usuario = u.NombreCompleto
+                }).ToListAsync();
+
+            return Ok(reservas);
+        }
+
     }
 }

@@ -7,6 +7,7 @@
         public int LaboratorioId { get; set; }
         public string Laboratorio { get; set; } = string.Empty;
         public string Ubicacion { get; set; } = string.Empty;
+        public string? Usuario { get; set; }
         public DateTime Fecha { get; set; }
         public TimeSpan HoraInicio { get; set; }
         public TimeSpan HoraFin { get; set; }

@@ -20,21 +20,23 @@ namespace SistemaDeReservas.Controllers
 
         // GET: /Reservas?filtro=proximas|historial
         [HttpGet]
-        public async Task<IActionResult> Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro, bool todas = false)
         {
+            var esAdmin = User.IsInRole("Administrador");
             var vm = new MisReservasViewModel
             {
                 Filtro = string.Equals(filtro, MisReservasViewModel.FiltroHistorial, StringComparison.OrdinalIgnoreCase)
                     ? MisReservasViewModel.FiltroHistorial
                     : MisReservasViewModel.FiltroProximas,
-                Ahora = DateTime.Now
+                Ahora = DateTime.Now,
+                Todas = esAdmin && todas
             };
 
             var client = _factory.CreateClient("WebAPI"); // el handler agrega el JWT
 
             try
             {
-                var response = await client.GetAsync("api/Reservas/mias");
+                var response = await client.GetAsync(vm.Todas ? "api/Reservas/todas" : "api/Reservas/mias");
 
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
@@ -115,7 +117,7 @@ namespace SistemaDeReservas.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancelar(int id, string? motivo, string? filtro)
+        public async Task<IActionResult> Cancelar(int id, string? motivo, string? filtro, bool todas = false)
         {
             var client = _factory.CreateClient("WebAPI");
 
@@ -154,7 +156,7 @@ namespace SistemaDeReservas.Controllers
             var filtroValido = string.Equals(filtro, MisReservasViewModel.FiltroHistorial, StringComparison.OrdinalIgnoreCase)
                 ? MisReservasViewModel.FiltroHistorial
                 : MisReservasViewModel.FiltroProximas;
-            return RedirectToAction(nameof(Index), new { filtro = filtroValido });
+            return RedirectToAction(nameof(Index), new { filtro = filtroValido, todas });
         }
     }
 

@@ -2,18 +2,20 @@
 
 Sistema de Reservas de Laboratorios.
 
-Este repositorio contiene el proyecto **BugBusters-Reservas**, un sistema para la gestión de reservas de laboratorios. La primera entrega (Sprint 1) se centró en el módulo de autenticación (login), sobre el cual se construyeron las historias siguientes: visualización de laboratorios y consulta de disponibilidad en el Sprint 2 y, en el Sprint 3, el registro de reservas con la validación de su horario y el control de conflictos entre reservas (a futuro, cancelaciones). Hasta el momento se han entregado las siguientes historias de usuario:
+Este repositorio contiene el proyecto **BugBusters-Reservas**, un sistema para la gestión de reservas de laboratorios. El Sprint 1 entregó el login; el Sprint 2, la visualización de laboratorios y la consulta de disponibilidad; el Sprint 3, el registro de reservas con validación de horario y control de conflictos; y el **Sprint 4**, la consulta de "Mis reservas" y la cancelación de reservas. Historias entregadas hasta el momento:
 
-| Historia | Descripción                                | Estado                                  |
-| -------- | ------------------------------------------ | --------------------------------------- |
-| **HU1**  | Inicio de sesión (login)                   | API + Frontend                          |
-| **HU2**  | Visualización de laboratorios              | API + Frontend |
-| **HU3**  | Consulta de disponibilidad de laboratorios | API + Frontend |
-| **HU4**  | Registrar una reserva                      | API + Frontend                          |
-| **HU5**  | Validar horario de reserva                 | API + Frontend                          |
-| **HU6**  | Evitar conflictos entre reservas           | API + Frontend                          |
+| Historia | Descripción                                | Sprint | Estado         |
+| -------- | ------------------------------------------ | ------ | -------------- |
+| **HU1**  | Inicio de sesión (login)                   | 1      | API + Frontend |
+| **HU2**  | Visualización de laboratorios              | 2      | API + Frontend |
+| **HU3**  | Consulta de disponibilidad de laboratorios | 2      | API + Frontend |
+| **HU4**  | Registrar una reserva                      | 3      | API + Frontend |
+| **HU5**  | Validar horario de reserva                 | 3      | API + Frontend |
+| **HU6**  | Evitar conflictos entre reservas           | 3      | API + Frontend |
+| **HU7**  | Consultar mis reservas                     | 4      | API + Frontend |
+| **HU8**  | Cancelar una reserva                       | 4      | API + Frontend |
 
-Las secciones que aplican a todo el proyecto (arquitectura, tecnologías, configuración, ejecución y seguridad) se encuentran agrupadas en [Información general del proyecto](#información-general-del-proyecto). Cada historia de usuario solo documenta lo que le es propio.
+Las secciones que aplican a todo el proyecto (arquitectura, tecnologías, configuración, ejecución y seguridad) están en [Información general del proyecto](#información-general-del-proyecto). Cada historia solo documenta lo que le es propio.
 
 ## Tabla de contenido
 
@@ -28,97 +30,63 @@ Las secciones que aplican a todo el proyecto (arquitectura, tecnologías, config
   - [Decisiones de diseño y deuda técnica](#decisiones-de-diseño-y-deuda-técnica)
   - [Evolución por sprint](#evolución-por-sprint)
 - [HU1 - Inicio de sesión](#hu1---inicio-de-sesión)
-  - [i. Definición de hecho (HU1)](#i-definición-de-hecho-hu1)
-  - [ii. Notas de la solución (HU1)](#ii-notas-de-la-solución-hu1)
-  - [iii. Implementación (HU1)](#iii-implementación-hu1)
-  - [iv. Pruebas (HU1)](#iv-pruebas-hu1)
 - [HU2 y HU3 - Visualización y consulta de disponibilidad de laboratorios](#hu2-y-hu3---visualización-y-consulta-de-disponibilidad-de-laboratorios)
-  - [i. Definición de hecho (HU2 y HU3)](#i-definición-de-hecho-hu2-y-hu3)
-  - [ii. Notas de la solución (HU2 y HU3)](#ii-notas-de-la-solución-hu2-y-hu3)
-  - [iii. Implementación (HU2 y HU3)](#iii-implementación-hu2-y-hu3)
-  - [iv. Pruebas (HU2 y HU3)](#iv-pruebas-hu2-y-hu3)
 - [HU4, HU5 y HU6 - Registro de reservas](#hu4-hu5-y-hu6---registro-de-reservas)
-  - [i. Definición de hecho (HU4, HU5 y HU6)](#i-definición-de-hecho-hu4-hu5-y-hu6)
-  - [ii. Notas de la solución (HU4, HU5 y HU6)](#ii-notas-de-la-solución-hu4-hu5-y-hu6)
-  - [iii. Implementación (HU4, HU5 y HU6)](#iii-implementación-hu4-hu5-y-hu6)
-  - [iv. Pruebas (HU4, HU5 y HU6)](#iv-pruebas-hu4-hu5-y-hu6)
+- [HU7 y HU8 - Consultar y cancelar reservas (Sprint 4)](#hu7-y-hu8---consultar-y-cancelar-reservas-sprint-4)
+  - [i. Definición de hecho (HU7 y HU8)](#i-definición-de-hecho-hu7-y-hu8)
+  - [ii. Notas de la solución (HU7 y HU8)](#ii-notas-de-la-solución-hu7-y-hu8)
+  - [iii. Implementación (HU7 y HU8)](#iii-implementación-hu7-y-hu8)
+  - [iv. Pruebas (HU7 y HU8)](#iv-pruebas-hu7-y-hu8)
+
+Cada historia está organizada en: **i. Definición de hecho**, **ii. Notas de la solución**, **iii. Implementación** y **iv. Pruebas**.
 
 ---
 
 # Información general del proyecto
 
-
 ## Arquitectura
 
-El proyecto está compuesto por **dos aplicaciones .NET 10** que se ejecutan en conjunto, además del script de base de datos.
+El proyecto está compuesto por **dos aplicaciones .NET 10** que se ejecutan en conjunto, un proyecto de pruebas y el script de base de datos.
 
 ```
 BugBusters-Reservas/
 ├── WebAPI/                          # Backend - API REST (ASP.NET Core Web API)
 │   ├── Controllers/
-│   │   ├── AuthController.cs        # Controlador del endpoint Auth (login)
+│   │   ├── AuthController.cs        # Login (HU1)
 │   │   ├── LaboratoriosController.cs # Laboratorios y disponibilidad (HU2, HU3)
-│   │   └── ReservasController.cs    # Registro de reservas y "mis reservas" (HU4, HU5, HU6)
-│   ├── DTOs/
-│   │   ├── LoginRequest.cs
-│   │   ├── LoginResponse.cs
-│   │   ├── LaboratorioResponse.cs
-│   │   ├── DisponibilidadResponse.cs
-│   │   ├── ReservaOcupadaResponse.cs
-│   │   ├── CrearReservaRequest.cs
-│   │   ├── ReservaResponse.cs
-│   │   └── MiReservaResponse.cs
-│   ├── Models/
-│   │   ├── Usuario.cs
-│   │   ├── Rol.cs
-│   │   ├── Laboratorio.cs
-│   │   └── Reserva.cs
-│   ├── Services/
-│   │   └── TokenService.cs          # Generación del JWT
-│   ├── Data/
-│   │   └── ReservasDBContext.cs
+│   │   └── ReservasController.cs    # Registrar, consultar y cancelar reservas (HU4-HU8)
+│   ├── DTOs/                        # Contratos de entrada/salida (Login*, Laboratorio*, Disponibilidad*,
+│   │                                #   ReservaOcupada*, CrearReserva*, Reserva*, MiReserva*, CancelarReserva*)
+│   ├── Models/                      # Usuario, Rol, Laboratorio, Reserva, Cancelacion
+│   ├── Services/TokenService.cs     # Generación del JWT
+│   ├── Data/ReservasDBContext.cs
 │   ├── Program.cs
 │   └── appsettings.json
 ├── SistemaDeReservas/               # Frontend - ASP.NET Core MVC
-│   ├── Controllers/
-│   │   ├── AccountController.cs     # Login / Logout
-│   │   ├── HomeController.cs        # Listado de laboratorios (HU2)
-│   │   ├── LaboratoriosController.cs # Tabla de disponibilidad (HU3)
-│   │   └── ReservasController.cs    # Registro de reserva (HU4-HU6) y "Mis reservas"
-│   ├── Handlers/
-│   │   └── JWTAuthHandler.cs        # Agrega el JWT a las llamadas hacia la WebAPI
-│   ├── Models/
-│   │   ├── LoginViewModel.cs
-│   │   ├── Laboratorio.cs
-│   │   ├── DisponibilidadViewModel.cs
-│   │   └── MisReservasViewModel.cs
-│   ├── Views/                       # Vistas Razor (html)
-│   │   ├── Account/Login.cshtml
-│   │   ├── Home/Index.cshtml
-│   │   ├── Laboratorios/Disponibilidad.cshtml
-│   │   ├── Reservas/Index.cshtml    # Mis reservas
-│   │   └── Shared/_Layout.cshtml
-│   ├── wwwroot/
-│   │   ├── css/                     # Estilos (login, home, disponibilidad, mis-reservas)
-│   │   └── img/                     # Imágenes (laboratorios, logo, login)
-│   ├── sistema-reservas-react/      # Cliente React (Vite + Tailwind), base inicial sin pantallas funcionales
-│   ├── SistemaDeReservas.slnx
-│   ├── SistemaDeReservas.slnLaunch
+│   ├── Controllers/                 # Account, Home, Laboratorios, Reservas ("Mis reservas", crear y cancelar)
+│   ├── Handlers/JWTAuthHandler.cs   # Agrega el JWT a las llamadas hacia la WebAPI
+│   ├── Models/                      # ViewModels (Login, Laboratorio, Disponibilidad, MisReservas)
+│   ├── Views/                       # Vistas Razor: Account/Login, Home/Index, Laboratorios/Disponibilidad,
+│   │                                #   Reservas/index (Mis reservas), Shared/_Layout
+│   ├── wwwroot/                     # css (login, home, disponibilidad, mis-reservas) e img
 │   └── Program.cs
 ├── WebApi_Test/                     # Pruebas unitarias (xUnit + EF Core InMemory)
-│   └── AuthController_Tests.cs      # 8 pruebas del login
+│   └── Unitarias/                   # Auth, Laboratorios (consulta y GETs), Reservas (Crear y Cancelar): 45 pruebas
 ├── database/
 │   └── 01_create_database.sql       # Script de creación y datos semilla
+├── azure-pipelines.yml              # CI: compila, prueba con cobertura y analiza en SonarQube Cloud
 └── README.md
 ```
 
-- **`WebAPI`**: expone los servicios vía **API REST**, siguiendo el patrón Controller → DTO → DbContext → Modelo. Concentra la lógica de negocio (autenticación, consulta de laboratorios y disponibilidad, y registro de reservas con sus validaciones y control de conflictos).
-- **`SistemaDeReservas`**: proyecto ASP.NET Core MVC que actúa como cliente web. Consume la `WebAPI` mediante un `HttpClient` con nombre (`"WebAPI"`) al que se le añade automáticamente el token JWT del usuario autenticado. Incluye las pantallas de inicio de sesión, listado de laboratorios, consulta de disponibilidad (desde donde se registra la reserva) y "Mis reservas".
-- **`WebApi_Test`**: proyecto de pruebas unitarias (xUnit) que usa una base de datos en memoria; referencia al proyecto `WebAPI`.
-- **Base de datos**: SQL Server, versionada mediante el script `database/01_create_database.sql`.
-- Ambos proyectos están referenciados en la misma solución (`SistemaDeReservas.slnx`), lo que permite ejecutarlos y depurarlos desde un solo lugar.
+- **`WebAPI`**: expone los servicios vía **API REST** con el patrón Controller → DTO → DbContext → Modelo. Concentra la lógica de negocio (autenticación, laboratorios y disponibilidad, registro y cancelación de reservas, con sus validaciones).
+- **`SistemaDeReservas`**: proyecto ASP.NET Core MVC que actúa como cliente web. Consume la `WebAPI` mediante un `HttpClient` con nombre (`"WebAPI"`) al que se le añade automáticamente el JWT del usuario autenticado. No contiene reglas de negocio: solo presenta datos y guía al usuario.
+- **`WebApi_Test`**: pruebas unitarias (xUnit) con base de datos en memoria; referencia al proyecto `WebAPI`.
+- **Base de datos**: SQL Server, versionada mediante `database/01_create_database.sql`.
+- Los proyectos comparten la solución `SistemaDeReservas.slnx`, por lo que se ejecutan y depuran desde un solo lugar.
+- **Ortogonalidad, acoplamiento y cohesión**: el frontend solo conoce el contrato HTTP de la API (no el modelo de datos); cada controlador de la API agrupa un solo tema (auth, laboratorios, reservas); los DTOs desacoplan el contrato de las entidades.
 
-> Este esquema del diseño que presenta el proyecto, se actualizara conforme al avance del mismo.
+> Este esquema se actualiza conforme avanza el proyecto.
+
 ## Stack tecnológico
 
 | Componente        | Tecnología                                                              |
@@ -131,7 +99,8 @@ BugBusters-Reservas/
 | Autenticación     | JWT Bearer (API) + Cookie de autenticación (Frontend)                   |
 | Contraseñas       | Hash con BCrypt (`BCrypt.Net-Next`)                                     |
 | Documentación API | `Microsoft.AspNetCore.OpenApi` + `Scalar.AspNetCore` (UI en `/scalar`)  |
-| Pruebas unitarias | xUnit 2.9 + `Microsoft.EntityFrameworkCore.InMemory`                    |
+| Pruebas unitarias | xUnit + `Microsoft.EntityFrameworkCore.InMemory`                        |
+| CI                | Azure Pipelines + SonarQube Cloud                                       |
 
 ## Requisitos previos
 
@@ -143,14 +112,11 @@ BugBusters-Reservas/
 
 ### 1. Base de datos
 
-Ejecutar el script `database/01_create_database.sql` contra una instancia de SQL Server. El script:
+Ejecutar `database/01_create_database.sql` contra una instancia de SQL Server. El script:
 
 - Crea la base de datos `ReservasLaboratorios` (elimina la existente si ya existía).
-- Crea las tablas `Roles`, `Usuarios`, `Laboratorios`, `Reservas` y `Cancelaciones` con sus llaves y restricciones.
-- Inserta datos semilla:
-  - 4 usuarios de prueba (`Admi`, `user01`, `user02`, `user03`), todos con la contraseña `Laboratorios123#` (guardada como hash BCrypt).
-  - 3 laboratorios de ejemplo (ver tabla siguiente).
-  - 3 reservas y 1 cancelación de ejemplo. La reserva 3 (Lab Computo 1, 2026-10-06, 09:00 – 11:00) permitía ver un bloque `Ocupado` en la tabla de disponibilidad. Las fechas de estas reservas ya pasaron, por lo que no sirven para probar conflictos: las pruebas de HU4, HU5 y HU6 registran sus propias reservas con fechas futuras.
+- Crea las tablas `Roles`, `Usuarios`, `Laboratorios`, `Reservas` y `Cancelaciones` con sus llaves y restricciones. `Cancelaciones` guarda **un único registro por reserva** (`UQ_Can_Reserva`) con quién canceló, cuándo y el motivo.
+- Inserta datos semilla: 4 usuarios (`Admi` con rol Administrador; `user01`, `user02`, `user03` con rol Usuario), todos con la contraseña `Laboratorios123#` (hash BCrypt), 3 laboratorios, 3 reservas y 1 cancelación de ejemplo.
 
 | Id | Laboratorio       | Ubicación            | Capacidad | Estado            | Horario de operación |
 |----|-------------------|----------------------|-----------|-------------------|----------------------|
@@ -158,9 +124,11 @@ Ejecutar el script `database/01_create_database.sql` contra una instancia de SQL
 | 2  | Lab Redes         | Edificio B - Piso 1  | 25        | `Habilitado`      | 08:00 – 20:00        |
 | 3  | Lab Electrónica   | Edificio C - Piso 3  | 20        | `FueraDeServicio` | 09:00 – 18:00        |
 
+Reservas semilla: la 1 y la 3 son de `user01` (ids de usuario: `Admi`=1, `user01`=2, `user02`=3, `user03`=4) y la 2 de `user02`; `user03` no tiene reservas. **Las tres están en fechas ya pasadas**, por lo que no sirven para probar reservas ni cancelaciones: las pruebas registran sus propias reservas con fechas futuras (diciembre de 2026).
+
 ### 2. Cadena de conexión y configuración JWT
 
-En `WebAPI/appsettings.json` ajustar la cadena `ConnectionStrings:Default` con el servidor, usuario y contraseña correctos. La sección `Jwt` define cómo se firma y valida el token:
+En `WebAPI/appsettings.json` ajustar `ConnectionStrings:Default` y la sección `Jwt`:
 
 ```json
 {
@@ -180,37 +148,28 @@ En `SistemaDeReservas/appsettings.json`, la clave `ApiBaseUrl` indica dónde est
 
 ## Ejecución
 
-| Proyecto            | URL por defecto                                  |
-|---------------------|--------------------------------------------------|
-| `WebAPI`            | `http://localhost:5068`                          |
+| Proyecto            | URL por defecto                                    |
+|---------------------|----------------------------------------------------|
+| `WebAPI`            | `http://localhost:5068` (Scalar en `/scalar`)      |
 | `SistemaDeReservas` | `http://localhost:5082` / `https://localhost:7241` |
 
-### API
-
 ```bash
-cd WebAPI
-dotnet restore
-dotnet run
+# API
+cd WebAPI && dotnet restore && dotnet run
+
+# Frontend (en otra terminal)
+cd SistemaDeReservas && dotnet run
 ```
 
-En ambiente de desarrollo, la API se puede explorar y probar desde la interfaz de **Scalar**:
-
-```
-http://localhost:5068/scalar
-```
-
-### Frontend
-
-```bash
-cd SistemaDeReservas
-dotnet run
-```
-
-El frontend depende de la API para funcionar (el login consulta el endpoint de autenticación), por lo que **ambos proyectos deben estar en ejecución al mismo tiempo**. Si se trabaja en Visual Studio, el frontend puede lanzarse por aparte del API para visualizar el sitio, pero sin la API en ejecución el login no cargará correctamente porque no podrá consultar el endpoint requerido.
+**Ambos proyectos deben estar en ejecución al mismo tiempo**, porque el frontend consume la API.
 
 ### Nota de despliegue (Visual Studio)
 
-Al tratarse de 2 proyectos dentro de una solución, se deben iniciar en conjunto. El repositorio incluye el archivo `SistemaDeReservas/SistemaDeReservas.slnLaunch` con el perfil **"Perfil de Arranque Simultaneo"**, que lanza `WebAPI` y `SistemaDeReservas` a la vez. Basta con seleccionar ese perfil en Visual Studio antes de ejecutar; de lo contrario, el frontend no podrá conectarse al API.
+El repositorio incluye `SistemaDeReservas/SistemaDeReservas.slnLaunch` con el perfil **"Perfil de Arranque Simultaneo"**, que lanza `WebAPI` y `SistemaDeReservas` a la vez. Basta seleccionarlo en Visual Studio antes de ejecutar.
+
+### Integración continua (Azure Pipelines)
+
+`azure-pipelines.yml` se ejecuta con cada push a `main`: instala .NET 10, restaura y compila, ejecuta las pruebas de `WebApi_Test` con cobertura, publica los resultados y envía el análisis a SonarQube Cloud (con su Quality Gate). Si alguna prueba falla, el pipeline falla.
 
 ### Pruebas automatizadas
 
@@ -219,57 +178,51 @@ cd WebApi_Test
 dotnet test
 ```
 
-El proyecto `WebApi_Test` contiene 8 pruebas del login (`AuthController_Tests`): credenciales válidas, usuario o contraseña vacíos, credenciales incorrectas, usuario inactivo, usuario inexistente y espacios en blanco en usuario y contraseña. No necesitan SQL Server porque usan una base de datos en memoria.
+45 pruebas unitarias que no necesitan SQL Server (usan una base en memoria). Detalle en [iv. Pruebas (HU7 y HU8)](#iv-pruebas-hu7-y-hu8).
 
 ## Autenticación y autorización (JWT)
 
-Es un mecanismo transversal: **todos los endpoints, excepto `POST /api/Auth/login`, requieren un token JWT** (atributo `[Authorize]`).
+Mecanismo transversal: **todos los endpoints, excepto `POST /api/Auth/login`, requieren un token JWT** (`[Authorize]`).
 
-1. El usuario inicia sesión con `POST /api/Auth/login` y el API responde con sus datos básicos y un `token`.
-2. **Frontend**: `AccountController` guarda el token como un claim (`AccessToken`) dentro de la cookie de autenticación. Luego, `JWTAuthHandler` lo lee y lo agrega como encabezado `Authorization: Bearer <token>` en cada llamada hacia la WebAPI.
-3. **Pruebas directas contra el API** (Scalar, Postman, etc.): se obtiene el token con el login y se envía manualmente en el encabezado `Authorization: Bearer <token>`. En Scalar se puede configurar en la sección de autenticación de la interfaz.
+1. El usuario inicia sesión con `POST /api/Auth/login` y la API responde con sus datos básicos y un `token`.
+2. **Frontend**: `AccountController` guarda el token como claim (`AccessToken`) en la cookie de autenticación y `JWTAuthHandler` lo envía como `Authorization: Bearer <token>` en cada llamada a la WebAPI.
+3. **Pruebas directas contra la API** (Scalar, Postman): se obtiene el token con el login y se envía en el encabezado `Authorization: Bearer <token>`.
 
-El token incluye como claims el id, nombre de usuario, nombre completo y rol, y expira según `Jwt:ExpiresInMinutes` (60 minutos). Una petición sin token, o con un token inválido o vencido, recibe `401 Unauthorized`.
-
-En el frontend, la cookie de autenticación es `HttpOnly`, `SameSite=Strict` y expira a los 25 minutos de inactividad (expiración deslizante). El login es la página inicial de la aplicación; si ya existe una sesión activa, abrirlo redirige directamente al inicio. Cuando no hay sesión, o cuando la WebAPI responde `401` (token inválido o vencido), el frontend cierra la sesión y redirige al login.
+El token incluye id, nombre de usuario, nombre completo y rol, y expira a los 60 minutos (`Jwt:ExpiresInMinutes`). Sin token, o con uno inválido o vencido, la API responde `401 Unauthorized`. En el frontend la cookie es `HttpOnly`, `SameSite=Strict` y expira tras 25 minutos de inactividad; ante un `401` de la API el frontend cierra la sesión y redirige al login.
 
 ## Resumen de endpoints
 
-| Método | Ruta                                          | Auth | Historia | Descripción                                             |
-|--------|-----------------------------------------------|------|----------|---------------------------------------------------------|
-| POST   | `/api/Auth/login`                             | No   | HU1      | Autentica un usuario y devuelve sus datos y el token    |
-| GET    | `/api/Laboratorios`                           | Sí   | HU2      | Lista los laboratorios registrados                      |
-| GET    | `/api/Laboratorios/{id}`                      | Sí   | HU2      | Obtiene un laboratorio (selección para reservar)        |
-| GET    | `/api/Laboratorios/{id}/disponibilidad`       | Sí   | HU3      | Consulta si un laboratorio está disponible en un horario |
-| GET    | `/api/Laboratorios/{id}/reservas`             | Sí   | HU3      | Lista las reservas activas de un laboratorio en un rango de fechas (marca los bloques ocupados de la tabla) |
-| POST   | `/api/Reservas`                               | Sí   | HU4, HU5, HU6 | Registra una reserva del usuario autenticado, validando su horario y que no tenga conflictos |
-| GET    | `/api/Reservas/mias`                          | Sí   | Complementario | Lista las reservas del usuario autenticado (pantalla "Mis reservas") |
+| Método | Ruta                                    | Auth | Historia      | Descripción                                                  |
+|--------|-----------------------------------------|------|---------------|--------------------------------------------------------------|
+| POST   | `/api/Auth/login`                       | No   | HU1           | Autentica un usuario y devuelve sus datos y el token         |
+| GET    | `/api/Laboratorios`                     | Sí   | HU2           | Lista los laboratorios                                       |
+| GET    | `/api/Laboratorios/{id}`                | Sí   | HU2           | Obtiene un laboratorio (selección para reservar)             |
+| GET    | `/api/Laboratorios/{id}/disponibilidad` | Sí   | HU3           | Consulta si un laboratorio está disponible en un horario     |
+| GET    | `/api/Laboratorios/{id}/reservas`       | Sí   | HU3           | Reservas activas de un laboratorio en un rango (bloques ocupados) |
+| POST   | `/api/Reservas`                         | Sí   | HU4, HU5, HU6 | Registra una reserva validando horario y conflictos          |
+| GET    | `/api/Reservas/mias`                    | Sí   | **HU7**       | Lista las reservas (activas y canceladas) del usuario autenticado |
+| GET    | `/api/Reservas/todas`                   | Sí (Administrador) | **HU7/HU8** | Lista las reservas de todos los usuarios (para que el administrador cancele cualquiera) |
+| POST   | `/api/Reservas/{id}/cancelar`           | Sí   | **HU8**       | Cancela una reserva propia que aún no ha iniciado (el administrador, cualquiera) |
 
 ## Decisiones de diseño y deuda técnica
 
-Aplican a todo el proyecto:
-
-- **Contraseñas con hash BCrypt**: las contraseñas se almacenan con hash BCrypt (`BCrypt.Net-Next`) y el login las valida con `BCrypt.Net.BCrypt.Verify`; ya no se guardan ni se comparan en texto plano como ocurría en el Sprint 1. Un valor que no tenga formato de hash BCrypt en `Usuarios.Contraseña` hace fallar la verificación, por lo que todo usuario nuevo debe guardarse hasheado.
-- **Secretos en el repositorio**: la clave `Jwt:Key` y la contraseña de la base de datos están en `appsettings.json`. Antes de un ambiente productivo deben moverse a *user-secrets*, variables de entorno o un gestor de secretos.
-- **DTOs separados del modelo**: se usan DTOs (`LoginRequest`, `LoginResponse`, `LaboratorioResponse`, `DisponibilidadResponse`, `ReservaOcupadaResponse`, `CrearReservaRequest`, `ReservaResponse`, `MiReservaResponse`) en lugar de exponer directamente las entidades de EF Core. Así se evita filtrar campos internos o sensibles (como la contraseña o `Active`) en las respuestas.
-- **Reglas de negocio en la API**: las validaciones de las reservas (horario, duración y conflictos) viven en la API; el frontend solo guía al usuario, de modo que cualquier cliente de la API queda sujeto a las mismas reglas.
-- **Autorización por rol pendiente**: el token ya transporta el rol del usuario, pero por ahora los endpoints solo exigen estar autenticado. Las restricciones por rol (Administrador / Usuario) quedan para historias futuras.
+- **Contraseñas con hash BCrypt** (`BCrypt.Net-Next`), verificadas con `BCrypt.Verify`. Todo usuario nuevo debe guardarse hasheado.
+- **Secretos en el repositorio**: `Jwt:Key` y la contraseña de la base de datos están en `appsettings.json`. Antes de un ambiente productivo deben moverse a *user-secrets*, variables de entorno o un gestor de secretos.
+- **DTOs separados del modelo**: las respuestas no exponen entidades de EF Core, para no filtrar campos internos o sensibles.
+- **Reglas de negocio en la API**: el frontend solo guía al usuario; cualquier cliente de la API queda sujeto a las mismas reglas.
+- **El usuario siempre sale del token**, nunca del cuerpo ni de la URL (reservar, consultar "mis reservas" y cancelar).
+- **Autorización por rol**: el token transporta el rol. Desde el Sprint 4 se aplica en dos puntos: `GET /api/Reservas/todas` exige el rol `Administrador` y `POST /api/Reservas/{id}/cancelar` permite al administrador cancelar reservas ajenas. El resto de los endpoints solo exige estar autenticado.
 
 ## Evolución por sprint
 
-Resumen de lo que cambió entre la primera entrega (solo login) y el estado actual del proyecto:
-
-| Tema                       | Sprint 1                                                                 | Sprint 2                                                                                   | Sprint 3                                                                                                   |
-|----------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| Alcance                    | HU1: login                                                               | HU1 + HU2 (visualizar laboratorios) + HU3 (consultar disponibilidad)                       | HU1 a HU3 + HU4 (registrar reserva) + HU5 (validar horario) + HU6 (evitar conflictos)                      |
-| Token de sesión            | El login devolvía solo los datos del usuario; no había JWT ni cookie     | El login devuelve un JWT; el frontend lo guarda en la cookie y lo reenvía a la WebAPI      | Sin cambios; el id del usuario del token se usa como responsable de la reserva                             |
-| Protección de endpoints    | Sin autorización sobre los endpoints                                     | Todos los endpoints, excepto `POST /api/Auth/login`, exigen JWT (`[Authorize]`)             | Los nuevos endpoints de reservas también exigen JWT                                                        |
-| Contraseñas                | Texto plano (comparación directa y datos semilla en texto plano)         | Hash BCrypt y verificación con `BCrypt.Verify`                                             | Sin cambios                                                                                                |
-| Frontend                   | Solo el *scaffolding* de la plantilla MVC (Home/Privacy/Error)           | Login, listado de laboratorios y tabla de disponibilidad; login como página inicial        | La tabla permite elegir un bloque y registrar la reserva; nueva pantalla "Mis reservas"; sesión de 25 minutos |
-| Endpoints                  | `POST /api/Auth/login`                                                   | Se agregan `GET /api/Laboratorios`, `/{id}`, `/{id}/disponibilidad` y `/{id}/reservas`      | Se agregan `POST /api/Reservas` y `GET /api/Reservas/mias`                                                 |
-| Datos semilla              | Roles y 4 usuarios de prueba                                             | Además laboratorios, reservas y una cancelación de ejemplo                                 | Las pruebas registran sus propias reservas, porque las del script semilla ya quedaron en fechas pasadas    |
-| Pruebas                    | Manuales (Scalar y Frontend)                                             | Manuales (Scalar y Frontend)                                                               | Manuales de HU4 a HU6 y proyecto `WebApi_Test` (xUnit) con 8 pruebas del login                             |
-| Ejecución en Visual Studio | Se lanzaba el frontend por aparte del API                                | Perfil de arranque simultáneo (`SistemaDeReservas.slnLaunch`)                              | Sin cambios                                                                                                |
+| Tema         | Sprint 1             | Sprint 2                                                  | Sprint 3                                                       | Sprint 4                                                              |
+|--------------|----------------------|-----------------------------------------------------------|----------------------------------------------------------------|-----------------------------------------------------------------------|
+| Alcance      | HU1: login           | + HU2 (laboratorios) y HU3 (disponibilidad)               | + HU4 (reservar), HU5 (validar horario) y HU6 (conflictos)     | + **HU7** (mis reservas) y **HU8** (cancelar reserva)                 |
+| Seguridad    | Sin JWT; contraseñas en texto plano | JWT, `[Authorize]` en la API y BCrypt        | Los endpoints de reservas también exigen JWT                   | Primer uso del rol: `todas` solo para `Administrador`; `mias` y `cancelar` usan el id del token |
+| Frontend     | Plantilla MVC        | Login, listado y tabla de disponibilidad                  | Reservar desde la tabla; pantalla "Mis reservas" básica        | "Mis reservas" con pestañas Próximas/Historial, cancelación con confirmación y vista "todas" para el administrador |
+| Endpoints    | `POST /Auth/login`   | + 4 endpoints de `Laboratorios`                           | + `POST /Reservas` y `GET /Reservas/mias`                      | + `POST /Reservas/{id}/cancelar` y `GET /Reservas/todas` (admin); `mias` se formaliza como HU7 |
+| Pruebas      | Manuales             | Manuales                                                  | Manuales + xUnit (login)                                       | Manuales + xUnit: 45 pruebas (login, laboratorios, crear y cancelar)  |
+| Ejecución    | Frontend por aparte  | Perfil de arranque simultáneo                             | Sin cambios                                                    | Pipeline de CI en Azure Pipelines con SonarQube Cloud                 |
 
 ---
 
@@ -277,61 +230,41 @@ Resumen de lo que cambió entre la primera entrega (solo login) y el estado actu
 
 ## i. Definición de hecho (HU1)
 
-Para considerar terminada (Done) la funcionalidad de **Login (AB#1)**, se deben cumplir los siguientes criterios:
+Para considerar terminada la funcionalidad de **Login (AB#1)**:
 
-- Existe un modelo de datos (`Usuario`, `Rol`) que representa la información necesaria para autenticar a un usuario.
-- La base de datos `ReservasLaboratorios` está creada mediante script SQL versionado (`database/01_create_database.sql`), incluyendo las tablas `Roles` y `Usuarios` con sus restricciones (llaves primarias, foráneas, valores únicos y por defecto).
-- El proyecto `WebAPI` se conecta correctamente a la base de datos SQL Server mediante Entity Framework Core (`ReservasDBContext`).
-- Existe un endpoint REST (`POST /api/Auth/login`) capaz de:
-  - Validar que el usuario y la contraseña no vengan vacíos.
-  - Verificar las credenciales contra la base de datos (la contraseña enviada se compara contra el hash BCrypt almacenado).
-  - Verificar que el usuario esté activo (`Activo = true`).
-  - Retornar la información básica del usuario autenticado (id, nombre de usuario, nombre completo y rol) junto con un token JWT cuando el login es correcto.
-- El endpoint diferencia y responde correctamente los distintos escenarios (petición inválida, credenciales incorrectas, usuario inactivo, login exitoso) con los códigos de estado HTTP adecuados.
-- Existen DTOs (`LoginRequest`, `LoginResponse`) que desacoplan el contrato de la API del modelo de datos interno.
-- El proyecto compila y expone documentación interactiva de la API (Scalar/OpenAPI) en ambiente de desarrollo.
-- El frontend consume el API para realizar la autenticación, conserva la sesión mediante cookie y reenvía el token JWT en las llamadas posteriores (ver [Autenticación y autorización](#autenticación-y-autorización-jwt)).
-- Se documentaron y ejecutaron manualmente al menos tres casos de prueba del login: uno positivo, uno neutro y uno negativo (ver sección [iv. Pruebas (HU1)](#iv-pruebas-hu1)).
+- Existe el modelo de datos (`Usuario`, `Rol`) y la base `ReservasLaboratorios` se crea con el script versionado (`database/01_create_database.sql`), con sus restricciones.
+- La `WebAPI` se conecta a SQL Server mediante Entity Framework Core (`ReservasDBContext`).
+- `POST /api/Auth/login` valida que usuario y contraseña no vengan vacíos, verifica las credenciales contra el hash BCrypt, verifica que el usuario esté activo y devuelve sus datos básicos con un token JWT.
+- Responde con el código HTTP adecuado en cada escenario (petición inválida, credenciales incorrectas, usuario inactivo, éxito) usando DTOs (`LoginRequest`, `LoginResponse`).
+- El frontend consume el API, conserva la sesión con una cookie y reenvía el JWT (ver [Autenticación y autorización](#autenticación-y-autorización-jwt)).
+- Se documentaron y ejecutaron casos de prueba positivos, neutros y negativos (ver iv).
 
 ## ii. Notas de la solución (HU1)
 
-- **Flujo**: Frontend (`AccountController`) → `POST api/auth/login` → `AuthController` → `ReservasDBContext` → tabla `Usuarios` (con su `Rol`). Si todo es correcto, `TokenService` genera el JWT.
-- **Orden de validaciones** del endpoint:
+- **Flujo**: `AccountController` → `POST api/auth/login` → `AuthController` → `ReservasDBContext` → `Usuarios` (con su `Rol`) → `TokenService` genera el JWT.
+- **Orden de validaciones**:
 
-| Orden | Validación                          | Respuesta                                                        |
-|-------|-------------------------------------|------------------------------------------------------------------|
-| 1     | Usuario o contraseña vacíos         | `400 Bad Request` — `"Usuario y contraseña son obligatorios."`   |
-| 2     | Usuario inexistente o contraseña incorrecta | `401 Unauthorized` — `"Credenciales incorrectas."`        |
-| 3     | Usuario con `Activo = 0`            | `401 Unauthorized` — `"El usuario se encuentra inactivo."`       |
-| 4     | Credenciales válidas                | `200 OK` — `LoginResponse` con `token`                           |
+| Orden | Validación                                  | Respuesta                                                      |
+|-------|---------------------------------------------|----------------------------------------------------------------|
+| 1     | Usuario o contraseña vacíos                 | `400` — `"Usuario y contraseña son obligatorios."`             |
+| 2     | Usuario inexistente o contraseña incorrecta | `401` — `"Credenciales incorrectas."`                          |
+| 3     | Usuario con `Activo = 0`                    | `401` — `"El usuario se encuentra inactivo."`                  |
+| 4     | Credenciales válidas                        | `200` — `LoginResponse` con `token`                            |
 
-- **Validación en el frontend**: `LoginViewModel` marca usuario y contraseña como obligatorios, de modo que los campos vacíos se rechazan en la pantalla sin llegar al API. Cualquier respuesta no exitosa del API se muestra al usuario como `"Usuario o contraseña incorrectos"`.
-- Tras un login correcto, el usuario es redirigido a la página de inicio (`Home/Index`), que desde el Sprint 2 muestra el listado de laboratorios (HU2). La página de inicio exige sesión y, si ya hay una sesión activa, abrir el login redirige directamente al inicio.
-- **Mostrar/ocultar contraseña**: el campo de contraseña del login incluye un botón con icono de ojo que permite ver lo digitado y volver a ocultarlo con otro clic.
+- **Frontend**: `LoginViewModel` marca ambos campos como obligatorios; cualquier respuesta no exitosa se muestra como `"Usuario o contraseña incorrectos"`. El login es la página inicial y, si ya hay sesión, redirige al inicio. El campo de contraseña tiene un botón (ojo) para mostrar u ocultar lo digitado.
 
 ## iii. Implementación (HU1)
 
-Los pasos para levantar el proyecto se encuentran en [Configuración inicial](#configuración-inicial) y [Ejecución](#ejecución).
-
-### Endpoint
-
-| Método | Ruta              | Descripción                                        |
-|--------|-------------------|----------------------------------------------------|
-| POST   | `/api/Auth/login` | Autentica un usuario y devuelve sus datos y un JWT |
-
-Ejemplo de petición:
+Pasos para levantar el proyecto en [Configuración inicial](#configuración-inicial) y [Ejecución](#ejecución).
 
 ```http
 POST /api/Auth/login
 Content-Type: application/json
 
-{
-  "nombreUsuario": "user01",
-  "password": "Laboratorios123#"
-}
+{ "nombreUsuario": "user01", "password": "Laboratorios123#" }
 ```
 
-Ejemplo de respuesta exitosa (`200 OK`):
+Respuesta (`200 OK`):
 
 ```json
 {
@@ -345,424 +278,121 @@ Ejemplo de respuesta exitosa (`200 OK`):
 
 ## iv. Pruebas (HU1)
 
-En este apartado se presentan las pruebas realizadas en el API y en el proyecto en conjunto (API + Frontend).
+Ejecutadas en el API (Scalar) y en el Frontend. Además existen 8 pruebas automatizadas (`AuthController_Tests`).
 
-### Caso 1 — Positivo: credenciales válidas de un usuario activo
-
-| Campo                  | Detalle                                                                                                                      |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que un usuario activo con credenciales correctas pueda iniciar sesión.                                             |
-| **Precondición**       | Existe el usuario `user01` con contraseña `Laboratorios123#` y `Activo = 1`.                                                 |
-| **Entrada**            | `{ "nombreUsuario": "user01", "password": "Laboratorios123#" }`                                                              |
-| **Resultado esperado** | `200 OK` con un `LoginResponse` que incluye `usuarioId`, `nombreUsuario`, `nombreCompleto`, `rol = "Usuario"` y `token`.     |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                    |
-
-### Caso 2 — Positivo desde el Frontend: credenciales válidas de un usuario activo
-
-| Campo                  | Detalle                                                                            |
-| ---------------------- | ---------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que un usuario activo con credenciales correctas pueda iniciar sesión.   |
-| **Precondición**       | Existe el usuario `user01` con contraseña `Laboratorios123#` y `Activo = 1`.       |
-| **Entrada**            | Username: `user01`<br>Contraseña: `Laboratorios123#`                               |
-| **Resultado esperado** | El usuario es reenviado a la página de inicio (a partir del Sprint 2, el listado de laboratorios). |
-| **Resultado obtenido** | Coincide con lo esperado.                                                          |
-
-### Caso 3 — Neutro: campos vacíos o incompletos en la solicitud
-
-| Campo                  | Detalle                                                                                                                                   |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar el comportamiento de la API ante una solicitud mal formada (sin credenciales), independientemente de si el usuario existe o no. |
-| **Precondición**       | Ninguna relacionada a datos de usuario; se prueba la validación de entrada.                                                               |
-| **Entrada**            | `{ "nombreUsuario": "", "password": "" }`                                                                                                 |
-| **Resultado esperado** | `400 Bad Request` con el mensaje `"Usuario y contraseña son obligatorios."`, sin consultar la base de datos.                              |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                 |
-
-### Caso 4 — Neutro desde el Frontend: campos vacíos o incompletos en la solicitud
-
-| Campo                  | Detalle                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar el comportamiento de la página web ante una solicitud mal formada (sin credenciales), independientemente de si el usuario existe o no. |
-| **Precondición**       | No se debe escribir nada en los campos de username y contraseña.                                                                                |
-| **Entrada**            | Usuario: ` `<br>Contraseña: ` `                                                                                                                 |
-| **Resultado esperado** | El sitio indica en cada uno de los campos un mensaje indicando que ese espacio es obligatorio.                                                  |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                       |
-
-### Caso 5 — Negativo: contraseña incorrecta o usuario inactivo
-
-| Campo                  | Detalle                                                                                                                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el sistema rechace el acceso cuando las credenciales no son válidas o el usuario está deshabilitado.                                                        |
-| **Precondición**       | Existe el usuario `user01`, pero se envía una contraseña incorrecta. (Escenario alterno: un usuario con `Activo = 0`.)                                                    |
-| **Entrada**            | `{ "nombreUsuario": "user01", "password": "ContraseñaIncorrecta" }`                                                                                                       |
-| **Resultado esperado** | `401 Unauthorized` con el mensaje `"Credenciales incorrectas."` En el escenario alterno de usuario inactivo, `401 Unauthorized` con `"El usuario se encuentra inactivo."` |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                                 |
-
-### Caso 6 — Negativo desde el Frontend: contraseña incorrecta
-
-| Campo                  | Detalle                                                                                                                       |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el sistema rechace el acceso cuando las credenciales no son válidas o el usuario está deshabilitado.            |
-| **Precondición**       | Existe el usuario `user01`, pero se envía una contraseña incorrecta.                                                          |
-| **Entrada**            | Username: `user01`<br>Contraseña: `cualquier cosa menos una correcta`                                                         |
-| **Resultado esperado** | La página muestra el mensaje `"Usuario o contraseña incorrectos"` y el usuario tiene que volver a ingresar los datos.         |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                     |
-
-> Nota: estas pruebas se realizaron tanto desde la interfaz del API como desde el propio Frontend, para confirmar la conexión entre el front y el API.
+| Caso | Tipo     | Entrada                                         | Resultado esperado                                                                 | Resultado |
+|------|----------|-------------------------------------------------|------------------------------------------------------------------------------------|-----------|
+| 1    | Positivo | API: `user01` / `Laboratorios123#` (activo)     | `200` con `usuarioId`, `nombreUsuario`, `nombreCompleto`, `rol = "Usuario"`, `token` | ✔ Coincide |
+| 2    | Positivo | Frontend: mismas credenciales                   | Redirige a la página de inicio (listado de laboratorios)                           | ✔ Coincide |
+| 3    | Neutro   | API: usuario y contraseña vacíos                | `400` — `"Usuario y contraseña son obligatorios."`, sin consultar la BD            | ✔ Coincide |
+| 4    | Neutro   | Frontend: campos vacíos                         | Cada campo muestra que es obligatorio                                              | ✔ Coincide |
+| 5    | Negativo | API: contraseña incorrecta (o usuario inactivo) | `401` — `"Credenciales incorrectas."` (o `"El usuario se encuentra inactivo."`)    | ✔ Coincide |
+| 6    | Negativo | Frontend: contraseña incorrecta                 | Mensaje `"Usuario o contraseña incorrectos"`                                       | ✔ Coincide |
 
 ---
 
 # HU2 y HU3 - Visualización y consulta de disponibilidad de laboratorios
 
-Ambas historias forman un solo flujo: en **HU2** el usuario ve el listado de laboratorios y selecciona uno; en **HU3** consulta, para ese laboratorio, si está disponible en una fecha y horario. Si lo está, puede continuar con el proceso de reserva (HU4).
+En **HU2** el usuario ve el listado de laboratorios y selecciona uno; en **HU3** consulta si está disponible en una fecha y horario, y puede continuar con la reserva (HU4).
 
 ## i. Definición de hecho (HU2 y HU3)
 
 ### HU2 - Visualización de laboratorios
 
-- **Listado**: `GET /api/Laboratorios` retorna la lista de los laboratorios registrados (los dados de baja lógica, `Active = 0`, no se incluyen).
--  **Información adecuada**: cada laboratorio incluye nombre, ubicación, capacidad, estado y horario de operación (`HoraApertura` / `HoraCierre`) (`LaboratorioResponse`), además de su identificador.
-- **Indicación de estado**: cada laboratorio indica su estado, que puede ser `Habilitado` o `FueraDeServicio`. Los laboratorios fuera de servicio también se listan, pero se identifican como tales.
-- **Selección del laboratorio (API)**: `GET /api/Laboratorios/{id}` permite obtener el laboratorio elegido, y su `id` es el que se utiliza para consultar disponibilidad y para reservar (HU4).
-- **Listado y selección en el Frontend**: la página de inicio muestra tarjetas con imagen, nombre, ubicación, capacidad, horario y estado visible (`Disponible` / `Fuera de servicio`), con buscador por nombre y vista en cartas o en lista. Cada laboratorio habilitado tiene el botón "Ver disponibilidad" para seleccionarlo; en los laboratorios fuera de servicio el botón aparece deshabilitado ("No disponible") y, si se accede directamente a su URL, se redirige al listado con un aviso.
+- `GET /api/Laboratorios` lista los laboratorios (sin los dados de baja lógica, `Active = 0`), con nombre, ubicación, capacidad, estado y horario de operación.
+- Cada laboratorio indica su estado (`Habilitado` / `FueraDeServicio`); los fuera de servicio también se listan, identificados como tales.
+- `GET /api/Laboratorios/{id}` permite seleccionar un laboratorio; su `id` se usa para consultar disponibilidad y reservar.
+- **Frontend**: tarjetas con imagen, datos y estado visible (`Disponible` / `Fuera de servicio`), buscador por nombre y vista en cartas o lista. "Ver disponibilidad" para los habilitados; deshabilitado ("No disponible") para los fuera de servicio, con redirección y aviso si se accede por URL.
 
 ### HU3 - Consulta de disponibilidad
 
-- **Selección**: la consulta se hace sobre el laboratorio seleccionado en el listado de HU2 (`/api/Laboratorios/{id}/disponibilidad`).
-- **Información de horario**: el usuario indica **fecha**, **hora inicial** y **hora final** (parámetros `fecha`, `horaInicio` y `horaFin`).
-- **Validación de horario**: el sistema rechaza con `400 Bad Request` los horarios inválidos (ver [orden de validaciones](#ii-notas-de-la-solución-hu2-y-hu3)).
-- **Verificación de reservas**: se comparan las reservas existentes del laboratorio seleccionado contra el horario consultado.
--  **Indicación de estado**: la respuesta indica con claridad si el laboratorio está disponible o no (`disponible: true | false` y un `mensaje`).
--  **Caso positivo**: si el laboratorio está disponible, la respuesta lo indica y el usuario puede continuar con la reserva (la creación de la reserva se implementó en la HU4).
--  **Sin colisiones**: las reservas con estado `Cancelada` no afectan la disponibilidad.
-- **Consulta de disponibilidad en el Frontend**: tabla semanal (lunes a viernes, bloques de una hora dentro del horario del laboratorio) en la que cada bloque se muestra como `Disponible` u `Ocupado`, con navegación entre semanas (sin retroceder antes de la semana actual) y leyenda de colores. Al elegir un bloque disponible se resalta como seleccionado y se muestra el resumen con la fecha y las horas de inicio y fin. Desde ese resumen se continúa con el registro de la reserva (HU4).
+- `GET /api/Laboratorios/{id}/disponibilidad` recibe `fecha`, `horaInicio` y `horaFin`, valida el horario (`400` si es inválido), compara contra las reservas del laboratorio y responde `disponible: true | false` con un `mensaje`.
+- Las reservas `Cancelada` no afectan la disponibilidad.
+- **Frontend**: tabla semanal (lunes a viernes, bloques de una hora) con `Disponible` / `Ocupado`, navegación entre semanas (sin retroceder antes de la actual) y leyenda. Al elegir un bloque se muestra el resumen y se continúa con HU4.
 
 ## ii. Notas de la solución (HU2 y HU3)
 
-### Modelo de datos involucrado
-
-| Entidad       | Campos relevantes                                                                                    |
-|---------------|------------------------------------------------------------------------------------------------------|
-| `Laboratorio` | `LaboratorioId`, `Nombre`, `Ubicacion`, `Capacidad`, `Estado`, `HoraApertura`, `HoraCierre`, `Active` |
-| `Reserva`     | `ReservaId`, `LaboratorioId`, `UsuarioId`, `Fecha`, `HoraInicio`, `HoraFin`, `Estado`, `Active`      |
-
-Restricciones de base de datos relevantes:
-
-- `Laboratorios.Estado` solo admite `Habilitado` o `FueraDeServicio` (`CK_Lab_Estado`).
-- `Laboratorios.HoraCierre` debe ser posterior a `HoraApertura` (`CK_Lab_Horario`).
-- `Reservas.Estado` solo admite `Activa` o `Cancelada` (`CK_Res_Estado`).
-
-### DTOs
-
-| DTO                     | Campos                                                          | Uso                          |
-|-------------------------|-----------------------------------------------------------------|------------------------------|
-| `LaboratorioResponse`   | `laboratorioId`, `nombre`, `ubicacion`, `capacidad`, `estado`, `horaApertura`, `horaCierre` | Respuesta de HU2 |
-| `DisponibilidadResponse`| `disponible` (bool), `mensaje` (string)                         | Respuesta de HU3             |
-| `ReservaOcupadaResponse`| `fecha`, `horaInicio`, `horaFin`                                | Apoyo de la tabla de HU3 (bloques ocupados) |
-
-### Decisiones de diseño
-
-- **Reservas canceladas**: solo se consideran las reservas con `Estado = 'Activa'`, por lo que las canceladas no bloquean el laboratorio.
-- **Reserva de un solo día**: la consulta recibe una única fecha; una reserva no abarca varios días.
-- **Laboratorios fuera de servicio visibles**: el listado los incluye para cumplir con la indicación de estado. Para la interfaz se debe mostrar el valor `FueraDeServicio` como **"Fuera de servicio"**.
-- **Respuesta de disponibilidad con HTTP 200**: "no disponible" es un resultado de negocio válido, no un error; los errores de validación se reservan para los `4xx`.
-- **Tabla semanal con una sola llamada**: para pintar la tabla, el frontend consulta `GET /api/Laboratorios/{id}/reservas` (una llamada por semana) en lugar de consultar la disponibilidad celda por celda. El endpoint `/disponibilidad` conserva las reglas de negocio completas (validación de horario, laboratorio fuera de servicio y conflictos) y es una consulta previa; al confirmar la reserva (HU4) `POST /api/Reservas` aplica de nuevo las mismas reglas.
-- **Laboratorios fuera de servicio sin tabla**: como `/reservas` no considera el estado del laboratorio, el frontend no permite abrir la tabla de un laboratorio fuera de servicio (botón deshabilitado y redirección al listado con aviso).
-
-### Observaciones y deuda técnica (HU2 y HU3)
-- **Datos semilla con fechas pasadas**: las reservas del script inicial están en septiembre de 2026. Como la consulta rechaza fechas pasadas, no sirven para probar la disponibilidad; por eso las pruebas de [iv. Pruebas (HU2 y HU3)](#iv-pruebas-hu2-y-hu3) incluyen un script de datos con fechas futuras.
-- **Cancelación en los datos semilla**: la reserva 1 se "cancela" insertando un registro en la tabla `Cancelaciones`, pero su `Reservas.Estado` permanece en `Activa`. Como la disponibilidad se basa en `Reservas.Estado`, esa reserva seguiría bloqueando el horario. La historia de cancelaciones debe actualizar `Reservas.Estado = 'Cancelada'` al registrar la cancelación (o el script semilla debe corregirse).
-- **Campo `Active` de `Reservas`**: la consulta de conflictos no filtra por `Reservas.Active`. Si se llegara a usar como baja lógica, habría que incluirlo en la condición.
-- **Fecha de referencia**: la validación de "fecha pasada" usa la fecha del servidor (`DateTime.Today`).
-- **Reserva de prueba para la tabla**: el script semilla incluye la reserva 3 (Lab Computo 1, 2026-10-06, 09:00 – 11:00) para visualizar bloques `Ocupado`. Esa fecha ya quedó en el pasado, por lo que ese bloque ya no se muestra como `Ocupado`; para verlo basta registrar una reserva desde el sistema (HU4).
-- **Endpoint `/reservas` sin validaciones de negocio**: no valida el estado ni el horario del laboratorio; solo devuelve las reservas activas del rango. Las validaciones completas ocurren en `/disponibilidad`.
+- **Modelo**: `Laboratorio` (`LaboratorioId`, `Nombre`, `Ubicacion`, `Capacidad`, `Estado`, `HoraApertura`, `HoraCierre`, `Active`) y `Reserva`. Restricciones: `CK_Lab_Estado`, `CK_Lab_Horario`, `CK_Res_Estado`.
+- **DTOs**: `LaboratorioResponse`, `DisponibilidadResponse` (`disponible`, `mensaje`) y `ReservaOcupadaResponse` (`fecha`, `horaInicio`, `horaFin`).
+- **Decisiones**:
+  - Solo cuentan las reservas con `Estado = 'Activa'`; la reserva es de un solo día.
+  - "No disponible" es un resultado válido (`200`); los `4xx` se reservan para errores de validación.
+  - La tabla semanal se pinta con una sola llamada a `/reservas` por semana, no consultando celda por celda. `/disponibilidad` conserva las reglas completas y `POST /api/Reservas` las vuelve a aplicar.
+  - El frontend no abre la tabla de un laboratorio fuera de servicio.
+- **Observaciones**: la validación de "fecha pasada" usa la fecha del servidor (`DateTime.Today`); `/reservas` no valida estado ni horario del laboratorio; `Reservas.Active` no se usa en la consulta de conflictos.
 
 ## iii. Implementación (HU2 y HU3)
 
-La configuración y ejecución del proyecto están en [Información general del proyecto](#información-general-del-proyecto). Todos los endpoints requieren el encabezado `Authorization: Bearer <token>` (ver [Autenticación y autorización](#autenticación-y-autorización-jwt)).
+Todos los endpoints requieren `Authorization: Bearer <token>`.
 
-### Endpoints
+| Método | Ruta                                    | Descripción                                                        |
+|--------|-----------------------------------------|--------------------------------------------------------------------|
+| GET    | `/api/Laboratorios`                     | Lista los laboratorios                                             |
+| GET    | `/api/Laboratorios/{id}`                | Obtiene un laboratorio                                             |
+| GET    | `/api/Laboratorios/{id}/disponibilidad` | Parámetros `fecha` (`2026-12-10`), `horaInicio` y `horaFin` (`09:00`) |
+| GET    | `/api/Laboratorios/{id}/reservas`       | Parámetros `desde` y `hasta`; devuelve las reservas activas del rango |
 
-| Método | Ruta                                    | Historia | Descripción                                              |
-|--------|-----------------------------------------|----------|----------------------------------------------------------|
-| GET    | `/api/Laboratorios`                     | HU2      | Lista los laboratorios                                   |
-| GET    | `/api/Laboratorios/{id}`                | HU2      | Obtiene un laboratorio específico (selección)            |
-| GET    | `/api/Laboratorios/{id}/disponibilidad` | HU3      | Consulta la disponibilidad en una fecha y horario        |
-| GET    | `/api/Laboratorios/{id}/reservas`       | HU3      | Lista las reservas activas del laboratorio en un rango de fechas |
+**Guía para Scalar**: (1) hacer login en `/api/Auth/login` y copiar el `token`; (2) en el endpoint deseado, completar el `id` y, en los encabezados, agregar `authorization` con el valor `Bearer <token>` (se repite en cada endpoint).
 
-Parámetros de `GET /api/Laboratorios/{id}/disponibilidad` (query string):
-
-| Parámetro    | Tipo        | Ejemplo      | Descripción        |
-|--------------|-------------|--------------|--------------------|
-| `fecha`      | Fecha       | `2026-10-15` | Día de la consulta |
-| `horaInicio` | Hora        | `09:00`      | Hora inicial       |
-| `horaFin`    | Hora        | `11:00`      | Hora final         |
-
-Parámetros de `GET /api/Laboratorios/{id}/reservas` (query string). Devuelve una lista de `ReservaOcupadaResponse` (`fecha`, `horaInicio`, `horaFin`) con las reservas cuyo `Estado` es `Activa`:
-
-| Parámetro | Tipo  | Ejemplo      | Descripción        |
-|-----------|-------|--------------|--------------------|
-| `desde`   | Fecha | `2026-10-05` | Inicio del rango   |
-| `hasta`   | Fecha | `2026-10-09` | Fin del rango      |
-
-### Guía para realizar consultas en Scalar
-
-#### 1. Realizar Inicio de Sesión (Login)
-
-En el Endpoint de /api/Auth/login, se necesita realizar el login normalmente para poder obtener un token que permite tener la autorización para realizar las consultas
-``` HTTP
-{
-  "nombreUsuario": "Admi",
-  "password": "Laboratorios123#"
-}
-```
-
->Cuando realiza el login, Scalar devolverá un JSON así
-
-``` JSON
-{
-  "usuarioId": 1,
-  "nombreUsuario": "Admi",
-  "nombreCompleto": "Administrador General",
-  "rol": "Administrador",
-  "token": "R5cCI6IkpXVCJ9.eyJzdWI" (Ejemplo de token)
-}
-
-```
-
->Este token es necesario copiarlo para tenerlo listo en posteriores consultas
-#### 2. Ahora se ingresa al endpoint de elección
-
-Para este ejemplo, se presentara el Endpoint **/api/Laboratorios/{id}** . Dentro del apartado de Scalar se presentan diferentes campos
-- Id -> En este se tiene que ingresar el id del Laboratorio que se quiere buscar
-- Headers (Encabezados de la consulta) **Importante**
-	- accept -> Este apartado no se toca y se mantiene igual
-	- authorization | Bearer + token del login
-		Este campo se tiene que agregar, e incluir ese campo de Bearer para que procese el token
-Esta misma accion se repite en cada endpoint que se necesite.
 ## iv. Pruebas (HU2 y HU3)
 
-Las pruebas se ejecutan contra el API (desde Scalar) y desde el Front-End para así probar ambas partes del sistema.
+Ejecutadas contra el API (Scalar) y el Frontend. Además hay pruebas automatizadas en `LaboratoriosController_GETS_Tests` y `LaboratoriosController_ConsDisponibilidad_Tests` (8 cada una).
 
-### HU2 - Visualización de laboratorios
-
-#### Caso HU2-1 — Positivo: listado de laboratorios
-
-| Campo                  | Detalle                                                                                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el sistema muestre los laboratorios registrados con su información y estado.                                                                                      |
-| **Precondición**       | Base de datos con los 3 laboratorios semilla (todos con `Active = 1`) y token válido.                                                                                           |
-| **Entrada**            | `GET /api/Laboratorios` con `Authorization: Bearer <token>`                                                                                                                     |
-| **Resultado esperado** | `200 OK` con 3 laboratorios; cada uno incluye `nombre`, `ubicacion`, `capacidad`, `estado`, `horaApertura` y `horaCierre`. Lab Computo 1 y Lab Redes con `Habilitado`; Lab Electrónica con `FueraDeServicio`. |
-| **Resultado obtenido** | Scalar, devuelve el json con la lista de los diferentes laboratorios que hay registrados en la base de datos.                                                                   |
-
-#### Caso HU2-2 — Positivo: selección de un laboratorio
-
-| Campo                  | Detalle                                                                                                                                        |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que se pueda obtener el laboratorio seleccionado desde el listado para continuar.                                                    |
-| **Precondición**       | Existe el laboratorio con `LaboratorioId = 1` y token válido.                                                                                  |
-| **Entrada**            | `GET /api/Laboratorios/1`                                                                                                                      |
-| **Resultado esperado** | `200 OK` con `{ "laboratorioId": 1, "nombre": "Lab Computo 1", "ubicacion": "Edificio A - Piso 2", "capacidad": 30, "estado": "Habilitado", "horaApertura": "07:00:00", "horaCierre": "22:00:00" }`. |
-| **Resultado obtenido** | Scalar devuelve la informacion del laboratorio cuya id esta registrada en la base de datos, sin importar el estado.                            |
-
-#### Caso HU2-3 — Negativo: acceso sin autenticación
-
-| Campo                  | Detalle                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el listado no esté disponible para usuarios sin sesión.                           |
-| **Precondición**       | Ninguna.                                                                                        |
-| **Entrada**            | `GET /api/Laboratorios` **sin** el encabezado `Authorization`                                   |
-| **Resultado esperado** | `401 Unauthorized`.                                                                             |
-| **Resultado obtenido** | Scalar devuelve el resultado esperado, indicando que no esta autorizado para realizar la accion |
-
-### HU3 - Consulta de disponibilidad
-
-#### Caso HU3-1 — Positivo: horario libre
-
-| Campo                  | Detalle                                                                                                                                                               |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el sistema indique disponible un laboratorio sin reservas en el horario consultado.                                                                     |
-| **Precondición**       | Datos de prueba cargados; token válido. Lab Computo 1                                                                                                                 |
-| **Entrada**            | Token válido; Lab Computo 1<br>Fecha: 2026-12-10T00:00:00Z (Fecha Valida)<br>Hora Inicio: 9:00<br>Hora Fin: 14:00                                                     |
-| **Resultado esperado** | `200 OK` con `{ "disponible": true, "mensaje": "El laboratorio se encuentra disponible." }`.                                                                          |
-| **Resultado obtenido** | El sistema, devuelve una respuesta satisfactoria, e indica <br>1. Que el laboratorio si esta disponible <br>2. `"mensaje": "El laboratorio se encuentra disponible."` |
-
-#### Caso HU3-2 — Positivo: horario contiguo a una reserva (límite exclusivo)
-
-| Campo                  | Detalle                                                                                                              |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que un horario que inicia justo cuando termina otra reserva no se considere colisión.                      |
-| **Precondición**       | Igual que HU3-1 (reserva activa de 09:00 a 11:00 en Lab Computo 1).                                                  |
-| **Entrada**            | `GET /api/Laboratorios/1/disponibilidad?fecha=2026-10-15&horaInicio=11:00&horaFin=13:00`                             |
-| **Resultado esperado** | `200 OK` con `disponible = true`.                                                                                    |
-| **Resultado obtenido** | "disponible": true,
-  "mensaje": "El laboratorio se encuentra disponible."                                                                                 |
-
-#### Caso HU3-3 — Positivo: una reserva cancelada no afecta la disponibilidad
-Igual que la siguiente prueba, se tienen que incluir datos para poder probar esto.
-
-| Campo                  | Detalle                                                                                             |
-| ---------------------- | --------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que las reservas canceladas no bloqueen el laboratorio.                                   |
-| **Precondición**       | Datos de prueba cargados; Lab Redes tiene una reserva **cancelada** el 2026-10-15 de 10:00 a 12:00. |
-| **Entrada**            | `GET /api/Laboratorios/2/disponibilidad?fecha=2026-10-15&horaInicio=10:00:00&horaFin=12:00:00` con `Authorization: Bearer <token>` |
-| **Resultado esperado** | `200 OK` con `disponible = true`.                                                                   |
-| **Resultado obtenido** | "disponible": true,
-  "mensaje": "El laboratorio se encuentra disponible."                                                                |
-
-#### Caso HU3-4 — Negativo: horario ocupado por una reserva activa
-
-
-| Campo                  | Detalle                                                                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el sistema indique "no disponible" cuando el horario se traslapa con una reserva activa.                    |
-| **Precondición**       | Datos de prueba cargados; Lab Computo 1 tiene una reserva activa el 2026-10-15 de 09:00 a 11:00.                          |
-| **Entrada**            | `GET /api/Laboratorios/1/disponibilidad?fecha=2026-10-15&horaInicio=09:00:00&horaFin=11:00:00` con `Authorization: Bearer <token>` |
-| **Resultado esperado** | `200 OK` con `{ "disponible": false, "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado." }`. |
-| **Resultado obtenido** |  "disponible": false,
-  "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado."                                                                                      |
-
-#### Caso HU3-5 — Negativo: laboratorio fuera de servicio
-
-| Campo                  | Detalle                                                                                                                      |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que un laboratorio fuera de servicio nunca se indique como disponible.                                             |
-| **Precondición**       | Lab Electrónica tiene `Estado = 'FueraDeServicio'`                                                                           |
-| **Entrada**            | Token válido; Lab Computo 3<br>Fecha: 2026-10-10T00:00:00Z (Fecha Valida)<br>Hora Inicio: 9:00<br>Hora Fin: 14:00            |
-| **Resultado esperado** | `200 OK` con `{ "disponible": false, "mensaje": "El laboratorio se encuentra fuera de servicio." }`.                         |
-| **Resultado obtenido** | Tira un respuesta adecuada, ya que no da error, sino que comunica que el laboratorio no puede ser consultado dada su estado. |
-
-#### Caso HU3-6 — Neutro: horarios inválidos
-
-| Campo                            | Detalle                                                                                                                  |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**                     | Verificar que el sistema valide el horario antes de consultar las reservas.                                              |
-| **Precondición**                 | Token válido; Lab Computo 1 <br>Fecha: 2026-01-10T00:00:00Z (Fecha Anterior)<br>Hora Inicio: 9:00<br>Hora Fin: 14:00     |
-| **Entrada y resultado esperado** | Se espera que el sistema sea capaz de indicar que no se puede consultar una fecha pasada                                 |
-| **Resultado obtenido**           | El sistema muestra un mensaje correspondiente:<br>`"mensaje": "No se puede consultar disponibilidad en fechas pasadas."` |
-
-#### Caso HU3-7 — Negativo: laboratorio inexistente
-
-| Campo                  | Detalle                                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar la respuesta cuando se consulta un laboratorio que no existe.                                                                                  |
-| **Precondición**       | No existe el laboratorio con `LaboratorioId = 55`; token válido.                                                                                         |
-| **Entrada**            | Token válido; Lab Computo 5<br>Fecha: 2026-01-10T00:00:00Z (Fecha Anterior)<br>Hora Inicio: 9:00<br>Hora Fin: 14:00                                      |
-| **Resultado esperado** | `404 Not Found` con `"Laboratorio no encontrado."`. Y ademas se adjunta un mensaje<br>`"mensaje": "Laboratorio no encontrado."`                          |
-| **Resultado obtenido** | El sistema indica que el laboratorio no existe, por lo que se deja ver que aunque también la fecha es pasada, el sistema verifica primero la existencia. |
+| Caso   | Tipo     | Entrada / precondición                                              | Resultado esperado                                                          | Resultado |
+|--------|----------|---------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------|
+| HU2-1  | Positivo | `GET /api/Laboratorios` con token                                   | `200` con los 3 laboratorios y su estado                                    | ✔ Coincide |
+| HU2-2  | Positivo | `GET /api/Laboratorios/1`                                           | `200` con los datos de Lab Computo 1                                        | ✔ Coincide |
+| HU2-3  | Negativo | `GET /api/Laboratorios` sin token                                   | `401 Unauthorized`                                                          | ✔ Coincide |
+| HU3-1  | Positivo | Lab Computo 1, fecha futura sin reservas                            | `200`, `disponible = true`                                                  | ✔ Coincide |
+| HU3-2  | Positivo | Horario que empieza justo cuando termina otra reserva               | `disponible = true` (límite exclusivo)                                      | ✔ Coincide |
+| HU3-3  | Positivo | Horario con una reserva **cancelada**                               | `disponible = true`                                                         | ✔ Coincide |
+| HU3-4  | Negativo | Horario traslapado con una reserva activa                           | `200`, `disponible = false` y mensaje de no disponible                      | ✔ Coincide |
+| HU3-5  | Negativo | Lab Electrónica (`FueraDeServicio`)                                 | `200`, `disponible = false`, `"El laboratorio se encuentra fuera de servicio."` | ✔ Coincide |
+| HU3-6  | Neutro   | Fecha pasada                                                        | Mensaje `"No se puede consultar disponibilidad en fechas pasadas."`         | ✔ Coincide |
+| HU3-7  | Negativo | Laboratorio inexistente                                             | `404` — `"Laboratorio no encontrado."` (se verifica antes que la fecha)     | ✔ Coincide |
 
 ---
 
 # HU4, HU5 y HU6 - Registro de reservas
 
-Las tres historias forman un solo flujo y comparten el mismo endpoint: en **HU4** el usuario registra la reserva de un laboratorio indicando fecha y horario; en **HU5** el sistema valida las condiciones del horario solicitado; y en **HU6** verifica que el laboratorio no tenga otra reserva en ese horario. Todas se resuelven en `POST /api/Reservas` (API) y en la tabla de disponibilidad (frontend), donde el usuario elige el bloque y confirma la reserva.
+Las tres historias comparten un flujo y el endpoint `POST /api/Reservas`: **HU4** registra la reserva, **HU5** valida el horario y **HU6** evita conflictos. En el frontend se resuelven desde la tabla de disponibilidad.
 
 ## i. Definición de hecho (HU4, HU5 y HU6)
 
-### HU4 - Registrar una reserva
-
-- **Información necesaria**: la reserva se registra con laboratorio, responsable, fecha, hora de inicio y hora de finalización. `CrearReservaRequest` recibe laboratorio, fecha y horas; el responsable se toma del usuario autenticado.
-- **Correspondencia de reserva**: el responsable es siempre el usuario autenticado. La API obtiene su id del token JWT (no del cuerpo de la petición), por lo que no es posible reservar a nombre de otra persona. El resumen de la pantalla muestra el responsable.
-- **Datos obligatorios**: si falta alguno, la API responde `400 Bad Request` indicando cuáles faltan y no registra nada. En el frontend, el botón "Reservar" permanece deshabilitado hasta elegir un bloque y la hora final se selecciona de una lista, por lo que no se envía un formulario incompleto.
-- **Horario correcto**: la hora final debe ser posterior a la hora inicial (se valida como parte de HU5).
-- **Mensaje de confirmación**: al registrar, la API responde `201 Created` con un `ReservaResponse` (`"Reserva registrada correctamente."`). El frontend muestra ese aviso sobre la tabla de disponibilidad, donde el bloque reservado pasa a `Ocupado`, y la reserva aparece en "Mis reservas".
-
-### HU5 - Validar horario de reserva
-
-- **Horario correcto**: la hora inicial debe ser menor a la hora final.
-- **Fecha antigua**: no se permiten reservas en fechas anteriores a la fecha actual.
-- **Horario de funcionamiento**: la reserva debe quedar dentro de la hora de apertura y cierre del laboratorio.
-- **Duración máxima**: una reserva no puede superar las 4 horas.
-- **Validación total**: se evalúan todas las reglas sin excepción. Si alguna no se cumple, la reserva se rechaza con `400 Bad Request`, y la respuesta trae en `mensaje` y `errores` la razón de cada regla incumplida. El frontend muestra el mensaje al usuario.
-
-### HU6 - Evitar conflictos entre reservas
-
-- **Traslape de reservas**: no se registra una reserva si el mismo laboratorio ya tiene una reserva activa en esa fecha cuyo horario se traslape.
-- **Conflictos parciales y completos**: la comparación (`horaInicio < reserva.HoraFin` y `horaFin > reserva.HoraInicio`) detecta tanto el traslape parcial (al inicio o al final) como el total (mismo horario, un horario contenido en otro o que lo cubre).
-- **Mismo horario en laboratorios diferentes**: la verificación se hace solo contra las reservas del laboratorio solicitado, por lo que otro laboratorio puede reservarse en ese mismo horario.
-- **Rechazo de solicitud**: ante un conflicto la API responde `409 Conflict` y no inserta nada.
-- **Informar estado**: la respuesta indica `"El laboratorio no se encuentra disponible en el horario solicitado."`. El frontend muestra el aviso y vuelve a cargar la tabla con el bloque en `Ocupado`.
-- **Sin falsos conflictos**: los horarios contiguos (uno termina cuando el otro empieza) y las reservas con estado `Cancelada` no bloquean el laboratorio.
+- **HU4**: la reserva se registra con laboratorio, fecha, hora de inicio y fin; el **responsable es el usuario autenticado** (id tomado del JWT, no del cuerpo). Si faltan datos, `400` indicando cuáles. Al registrar responde `201` con `"Reserva registrada correctamente."` y el frontend lo muestra sobre la tabla (el bloque pasa a `Ocupado`).
+- **HU5**: se validan todas las reglas "sin excepción" y se informan juntas (`mensaje` y `errores`, `400`): hora final posterior a la inicial, fecha no anterior a hoy, dentro del horario de operación del laboratorio y duración máxima de 4 horas.
+- **HU6**: no se registra una reserva que se traslape (parcial o total) con otra **activa** del mismo laboratorio y fecha; responde `409` con `"El laboratorio no se encuentra disponible en el horario solicitado."`. No generan conflicto los horarios contiguos, las reservas canceladas ni el mismo horario en otro laboratorio.
 
 ## ii. Notas de la solución (HU4, HU5 y HU6)
 
-- **Flujo**: Frontend (tabla de `LaboratoriosController.Disponibilidad`) → el usuario elige un bloque y la hora final → `POST /Reservas/Crear` (`ReservasController` del frontend, con token antifalsificación) → `POST api/Reservas` con el JWT agregado por `JWTAuthHandler` → `ReservasController` (API) → `ReservasDBContext` → tabla `Reservas`. El resultado se guarda en `TempData` y se redirige a la misma semana del laboratorio.
-- **Orden de validaciones** del endpoint `POST /api/Reservas`:
+- **Flujo**: tabla de disponibilidad → `POST /Reservas/Crear` (frontend, con token antifalsificación) → `POST api/Reservas` (JWT agregado por `JWTAuthHandler`) → `ReservasController` (API) → `Reservas`. El resultado se guarda en `TempData` y se redirige a la misma semana.
+- **Orden de validaciones** de `POST /api/Reservas`:
 
-| Orden | Validación                                                                                                  | Respuesta                                                                           |
-|-------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| 1     | Token sin un id de usuario válido                                                                           | `401 Unauthorized`                                                                  |
-| 2     | Falta el laboratorio, la fecha, la hora de inicio o la hora de finalización                                 | `400 Bad Request` — `"Debe indicar la fecha, la hora de inicio."` (lista lo que falta) |
-| 3     | Laboratorio inexistente o dado de baja (`Active = 0`)                                                       | `404 Not Found` — `"Laboratorio no encontrado."`                                    |
-| 4     | Reglas de horario de HU5: hora final no posterior, fecha pasada, fuera del horario de operación, más de 4 h | `400 Bad Request` — `mensaje` con todas las razones y `errores` con la lista        |
-| 5     | Laboratorio con `Estado = 'FueraDeServicio'`                                                                | `409 Conflict` — `"El laboratorio se encuentra fuera de servicio."`                 |
-| 6     | Traslape con una reserva activa (HU6)                                                                       | `409 Conflict` — `"El laboratorio no se encuentra disponible en el horario solicitado."` |
-| 7     | Todo correcto                                                                                               | `201 Created` — `ReservaResponse`                                                   |
+| Orden | Validación                                                                     | Respuesta                                                   |
+|-------|--------------------------------------------------------------------------------|-------------------------------------------------------------|
+| 1     | Token sin id de usuario válido                                                 | `401`                                                       |
+| 2     | Falta laboratorio, fecha, hora de inicio u hora de finalización                | `400` — `"Debe indicar ..."` (lista lo que falta)           |
+| 3     | Laboratorio inexistente o dado de baja                                         | `404` — `"Laboratorio no encontrado."`                      |
+| 4     | Reglas de horario de HU5 (acumulativas)                                        | `400` — `mensaje` y `errores`                               |
+| 5     | Laboratorio `FueraDeServicio`                                                  | `409` — `"El laboratorio se encuentra fuera de servicio."`  |
+| 6     | Traslape con una reserva activa (HU6)                                          | `409` — `"El laboratorio no se encuentra disponible en el horario solicitado."` |
+| 7     | Todo correcto                                                                  | `201` — `ReservaResponse`                                   |
 
-### Modelo de datos involucrado
-
-| Entidad   | Valores al registrar una reserva                                                                                                                      |
-|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Reserva` | `UsuarioId` (del token), `LaboratorioId`, `Fecha`, `HoraInicio`, `HoraFin`, `Estado = 'Activa'`, `FechaRegistro` (fecha y hora del servidor), `Active = 1` |
-
-### DTOs
-
-| DTO                   | Campos                                                                                         | Uso                                         |
-|-----------------------|------------------------------------------------------------------------------------------------|---------------------------------------------|
-| `CrearReservaRequest` | `laboratorioId`, `fecha`, `horaInicio`, `horaFin` (todos opcionales en el contrato)            | Cuerpo de `POST /api/Reservas`              |
-| `ReservaResponse`     | `reservaId`, `laboratorioId`, `laboratorio`, `fecha`, `inicioReserva`, `finReserva`, `estado`, `mensaje` | Respuesta de la reserva registrada          |
-| `MiReservaResponse`   | `reservaId`, `laboratorioId`, `laboratorio`, `ubicacion`, `fecha`, `horaInicio`, `horaFin`, `estado`, `fechaRegistro` | Respuesta de `GET /api/Reservas/mias`       |
-
-### Decisiones de diseño
-
-- **Responsable tomado del token**: el contrato no incluye el usuario; así se cumple la correspondencia entre la reserva y el usuario autenticado sin depender de lo que envíe el cliente.
-- **Campos opcionales en la petición**: `CrearReservaRequest` usa tipos que admiten nulo para distinguir un dato que no se envió de un valor por defecto (por ejemplo `00:00`) y poder indicar qué falta.
-- **Validación acumulativa**: `POST /api/Reservas` reporta todas las reglas de horario incumplidas (HU5 exige validar "sin excepción"), a diferencia de `/disponibilidad`, que se detiene en la primera.
-- **`409 Conflict` en lugar de `200`**: en `/disponibilidad`, "no disponible" es un resultado de consulta válido (`200`); en `POST /api/Reservas` es una acción que no se puede completar, por lo que se responde `409`.
-- **Verificación e inserción en una sola transacción**: la búsqueda de traslapes y el `INSERT` se ejecutan en una transacción con aislamiento `Serializable`, para que dos usuarios no puedan reservar el mismo espacio al mismo tiempo.
-- **API como fuente de verdad**: el frontend restringe la hora final a un rango de 1 a 4 horas posteriores al inicio sin pasar del cierre del laboratorio, pero todas las reglas se vuelven a validar en la API.
-- **Reserva de un solo día y horas completas en la interfaz**: la tabla trabaja con bloques de una hora; la API acepta cualquier hora que cumpla las reglas. La duración máxima está definida en la constante `DuracionMaximaHoras` de `ReservasController`.
-- **Mis reservas (complementario)**: el frontend incluye la pantalla "Mis reservas", alimentada por `GET /api/Reservas/mias`, para que el usuario confirme sus reservas. La base de datos solo guarda `Activa` o `Cancelada`; los estados *Próxima*, *En curso* y *Finalizada* se deducen comparando la fecha y hora de la reserva con la actual. Las pestañas separan "Próximas" (activas que aún no terminan) del "Historial" (finalizadas y canceladas).
-
-### Observaciones y deuda técnica (HU4, HU5 y HU6)
-
-- **Hora pasada en el día actual**: la regla de "fecha antigua" compara solo la fecha, por lo que hoy se acepta una reserva cuya hora ya pasó.
-- **Días pasados de la semana en curso**: la tabla arranca el lunes de la semana actual y no deshabilita los días anteriores a hoy; si se elige uno, la API rechaza la reserva y el mensaje se muestra en pantalla.
-- **Hora final y bloques ocupados**: la lista de hora final solo respeta las 4 horas y el cierre del laboratorio; si entre el inicio y la hora final elegida hay un bloque ocupado, la API responde `409` y se informa al usuario.
-- **Fecha y hora del servidor**: `DateTime.Today` y `DateTime.Now` se evalúan en el servidor, sin manejo de zonas horarias.
-- **Mensajes de horario distintos**: el mensaje de horario de operación de `/disponibilidad` muestra las horas como `07:00:00`, mientras que `POST /api/Reservas` las muestra como `07:00`.
-- **Cancelación pendiente**: ninguna pantalla ni endpoint cancela reservas todavía; el estado `Cancelada` solo existe por datos cargados en la base de datos.
-- **Pruebas automatizadas**: el proyecto `WebApi_Test` cubre el login (8 pruebas); las pruebas de reservas de este sprint se realizaron manualmente (ver [iv. Pruebas (HU4, HU5 y HU6)](#iv-pruebas-hu4-hu5-y-hu6)).
-- **Cliente React sin integrar**: `sistema-reservas-react` quedó como base (Vite + Tailwind) con una pantalla de prueba y no reemplaza a las vistas Razor, que siguen siendo la interfaz del sistema.
-- **`[Authorize]` desactivado en el frontend**: `LaboratoriosController` del frontend tiene el atributo comentado; el acceso sigue protegido porque la API responde `401` sin sesión válida y el frontend redirige al login, pero conviene reactivarlo.
+- **DTOs**: `CrearReservaRequest` (campos opcionales para distinguir "no enviado" de un valor por defecto) y `ReservaResponse`.
+- **Decisiones**: la verificación de traslape y el `INSERT` van en una transacción `Serializable` (dos usuarios no pueden reservar el mismo espacio a la vez); `409` en lugar de `200` porque aquí la acción no se puede completar; la API es la fuente de verdad (el frontend limita la hora final a 1–4 horas sin pasar del cierre, pero todo se revalida); la duración máxima está en la constante `DuracionMaximaHoras`.
+- **Observaciones**: hoy se acepta una reserva cuya hora ya pasó (solo se compara la fecha); la tabla no deshabilita los días anteriores a hoy en la semana en curso (la API rechaza y se muestra el mensaje); `DateTime.Today` y `DateTime.Now` usan la hora del servidor sin zonas horarias.
 
 ## iii. Implementación (HU4, HU5 y HU6)
-
-La configuración y ejecución del proyecto están en [Información general del proyecto](#información-general-del-proyecto). Ambos endpoints requieren el encabezado `Authorization: Bearer <token>` (ver [Autenticación y autorización](#autenticación-y-autorización-jwt)).
-
-### Endpoints
-
-| Método | Ruta                 | Historia        | Descripción                                                              |
-|--------|----------------------|-----------------|--------------------------------------------------------------------------|
-| POST   | `/api/Reservas`      | HU4, HU5 y HU6  | Registra una reserva a nombre del usuario autenticado                    |
-| GET    | `/api/Reservas/mias` | Complementario  | Lista las reservas activas y canceladas del usuario autenticado (más recientes primero) |
-
-Ejemplo de petición:
 
 ```http
 POST /api/Reservas
 Authorization: Bearer <token>
 Content-Type: application/json
 
-{
-  "laboratorioId": 1,
-  "fecha": "2026-12-10",
-  "horaInicio": "09:00:00",
-  "horaFin": "11:00:00"
-}
+{ "laboratorioId": 1, "fecha": "2026-12-10", "horaInicio": "09:00:00", "horaFin": "11:00:00" }
 ```
 
-Ejemplo de respuesta exitosa (`201 Created`):
+Respuesta (`201 Created`):
 
 ```json
 {
@@ -777,258 +407,231 @@ Ejemplo de respuesta exitosa (`201 Created`):
 }
 ```
 
-Ejemplo de rechazo por reglas de horario (`400 Bad Request`), con fecha pasada y duración mayor a 4 horas:
+Rechazo por reglas de horario (`400`) y por conflicto (`409`):
 
 ```json
-{
-  "mensaje": "No se pueden realizar reservas en fechas anteriores a la fecha actual. Una reserva no puede superar las 4 horas.",
-  "errores": [
-    "No se pueden realizar reservas en fechas anteriores a la fecha actual.",
-    "Una reserva no puede superar las 4 horas."
-  ]
-}
+{ "mensaje": "No se pueden realizar reservas en fechas anteriores a la fecha actual. Una reserva no puede superar las 4 horas.",
+  "errores": [ "No se pueden realizar reservas en fechas anteriores a la fecha actual.", "Una reserva no puede superar las 4 horas." ] }
 ```
-
-Ejemplo de rechazo por conflicto (`409 Conflict`):
-
 ```json
-{
-  "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado."
-}
+{ "mensaje": "El laboratorio no se encuentra disponible en el horario solicitado." }
 ```
 
-### Guía para registrar una reserva en Scalar
+**Desde Scalar**: login → agregar `authorization: Bearer <token>` → `POST /api/Reservas` con `laboratorioId`, `fecha`, `horaInicio` y `horaFin` (el usuario se toma del token) → revisar el resultado y consultar `GET /api/Reservas/mias`.
 
-1. Iniciar sesión en `/api/Auth/login` con un usuario de prueba (por ejemplo `user01`) y copiar el `token`.
-2. Abrir el endpoint `POST /api/Reservas` y, en los encabezados, agregar `authorization` con el valor `Bearer <token>`.
-3. En el cuerpo de la petición, indicar `laboratorioId`, `fecha`, `horaInicio` y `horaFin`, como en el ejemplo anterior. No se envía el usuario: se toma del token.
-4. Enviar la petición y revisar el código de estado y el `mensaje` de la respuesta.
-5. Para ver la reserva registrada, consultar `GET /api/Reservas/mias` con el mismo token.
-
-### Guía para registrar una reserva desde el frontend
-
-1. Iniciar sesión y, en el inicio, elegir un laboratorio habilitado con "Ver disponibilidad".
-2. En la tabla semanal, hacer clic en un bloque `Disponible`; se resalta como seleccionado y el panel "Resumen de la reserva" muestra el responsable, el laboratorio, la fecha y la hora de inicio.
-3. Elegir la hora de finalización en la lista (de 1 a 4 horas después del inicio, sin pasar del cierre del laboratorio).
-4. Presionar "Reservar". La página muestra el aviso de confirmación o el motivo del rechazo, y la tabla se actualiza.
-5. Revisar la reserva en "Mis reservas" (menú superior), en la pestaña "Próximas".
+**Desde el frontend**: iniciar sesión → "Ver disponibilidad" de un laboratorio habilitado → clic en un bloque `Disponible` → elegir la hora de finalización (1 a 4 horas después, sin pasar del cierre) → "Reservar" → revisar el aviso y la reserva en "Mis reservas".
 
 ## iv. Pruebas (HU4, HU5 y HU6)
 
-Las pruebas se ejecutan contra el API (desde Scalar) y desde el Frontend. Para cada caso se usa un token de `user01`, salvo donde se indique otro usuario. Los casos usan fechas futuras (diciembre de 2026) y, cuando necesitan una reserva previa, esta se registra con el mismo endpoint, ya que las reservas del script semilla están en fechas pasadas. Datos base utilizados:
+Ejecutadas contra el API (Scalar) y el Frontend con fechas futuras (diciembre de 2026); cuando se necesita una reserva previa se registra con el mismo endpoint. Además hay 10 pruebas automatizadas en `ReservasController_Crear_Tests`.
 
-| Id | Laboratorio       | Horario de operación | Estado            |
-|----|-------------------|----------------------|-------------------|
-| 1  | Lab Computo 1     | 07:00 – 22:00        | `Habilitado`      |
-| 2  | Lab Redes         | 08:00 – 20:00        | `Habilitado`      |
-| 3  | Lab Electrónica   | 09:00 – 18:00        | `FueraDeServicio` |
+| Caso   | Tipo     | Entrada / precondición                                                      | Resultado esperado                                                               | Resultado |
+|--------|----------|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------|-----------|
+| HU4-1  | Positivo | `POST` válido: Lab 1, 2026-12-10, 09:00–11:00                               | `201`, `estado = "Activa"`, mensaje de confirmación                              | ✔ Coincide |
+| HU4-2  | Positivo | Frontend: bloque `Disponible` → fin 12:00 → "Reservar"                      | Aviso de confirmación, bloques `Ocupado` y reserva en "Próximas"                 | ✔ Coincide |
+| HU4-3  | Positivo | `user02` reserva Lab Redes; luego `/mias` con cada token                    | `201`; aparece en `/mias` de `user02` y no en el de `user01`                     | ✔ Coincide |
+| HU4-4  | Negativo | `POST` con solo `laboratorioId`                                             | `400` — `"Debe indicar la fecha, la hora de inicio, la hora de finalización."`   | ✔ Coincide |
+| HU4-5  | Negativo | Laboratorio 55 (inexistente)                                                | `404` — `"Laboratorio no encontrado."`                                           | ✔ Coincide |
+| HU4-6  | Negativo | `POST` sin token                                                            | `401 Unauthorized`                                                               | ✔ Coincide |
+| HU5-1  | Negativo | Hora final anterior o igual a la inicial                                    | `400` — `"La hora final debe ser posterior a la hora inicial."`                  | ✔ Coincide |
+| HU5-2  | Negativo | Fecha pasada                                                                | `400` — `"No se pueden realizar reservas en fechas anteriores a la fecha actual."` | ✔ Coincide |
+| HU5-3  | Negativo | Lab Redes de 07:00 a 09:00 (abre 08:00)                                     | `400` — `"El laboratorio solo puede reservarse entre 08:00 y 20:00."`            | ✔ Coincide |
+| HU5-4  | Negativo | Reserva de 5 horas                                                          | `400` — `"Una reserva no puede superar las 4 horas."`                             | ✔ Coincide |
+| HU5-5  | Positivo | Reserva de exactamente 4 horas (09:00–13:00)                                | `201` (límite inclusivo)                                                         | ✔ Coincide |
+| HU5-6  | Negativo | Fecha pasada y 5 horas a la vez                                             | `400` con ambas razones en `mensaje` y `errores`                                 | ✔ Coincide |
+| HU5-7  | Neutro   | Frontend: lista "Hora de finalización" con inicio 09:00 y 19:00 (Lab Redes) | De 10:00 a 13:00 (máx. 4 h) y solo 20:00 (no pasa del cierre)                    | ✔ Coincide |
+| HU5-8  | Negativo | Frontend: bloque de un día anterior a hoy en la semana en curso             | Aviso en rojo de fecha anterior; no se registra                                  | ✔ Coincide |
+| HU6-1  | Negativo | Mismo laboratorio y mismo horario que una reserva activa                    | `409` — no disponible; sin nueva reserva                                         | ✔ Coincide |
+| HU6-2  | Negativo | Traslape al inicio, al final, contenido y que la cubre (reserva base 09–11) | Las cuatro responden `409`                                                       | ✔ Coincide |
+| HU6-3  | Positivo | Horario contiguo (11:00–13:00)                                              | `201`                                                                            | ✔ Coincide |
+| HU6-4  | Positivo | Mismo horario en otro laboratorio                                           | `201`                                                                            | ✔ Coincide |
+| HU6-5  | Positivo | Horario de una reserva **cancelada**                                        | `201`                                                                            | ✔ Coincide |
+| HU6-6  | Negativo | Frontend: la hora final cruza un bloque ocupado                             | Aviso en rojo de no disponible; la tabla conserva el bloque `Ocupado`            | ✔ Coincide |
 
-### HU4 - Registrar una reserva
+---
 
-#### Caso HU4-1 — Positivo: reserva con todos los datos válidos
+# HU7 y HU8 - Consultar y cancelar reservas (Sprint 4)
 
-| Campo                  | Detalle                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que se registre una reserva con laboratorio, fecha y horario válidos a nombre del usuario autenticado.                                |
-| **Precondición**       | Token válido de `user01`; Lab Computo 1 habilitado y sin reservas el 2026-12-10.                                                                |
-| **Entrada**            | `POST /api/Reservas`<br>`{ "laboratorioId": 1, "fecha": "2026-12-10", "horaInicio": "09:00:00", "horaFin": "11:00:00" }`                        |
-| **Resultado esperado** | `201 Created` con un `ReservaResponse` con `estado = "Activa"`, el horario solicitado y `mensaje = "Reserva registrada correctamente."`.        |
-| **Resultado obtenido** | Coincide con lo esperado. La reserva queda registrada y se puede ver en `GET /api/Reservas/mias`.                                               |
+Ambas historias comparten la pantalla **"Mis reservas"** (menú superior): en **HU7** el usuario consulta las reservas que ha realizado y en **HU8** cancela una de ellas para liberar el horario. Trazabilidad: **PBI 7 (HU7)** y **PBI 8 (HU8)** en Azure Boards, iteración *Sistema de Reservas\Sprint 4*, con sus criterios de aceptación y los commits referenciando `AB#7` / `AB#8`.
 
-#### Caso HU4-2 — Positivo desde el Frontend: reservar desde la tabla de disponibilidad
+## i. Definición de hecho (HU7 y HU8)
 
-| Campo                  | Detalle                                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar el flujo completo de reserva en la interfaz.                                                                                                                   |
-| **Precondición**       | Sesión iniciada con `user01`; Lab Computo 1 habilitado y con bloques `Disponible` en la semana siguiente.                                                                |
-| **Entrada**            | Ver disponibilidad de Lab Computo 1 → clic en un bloque `Disponible` (por ejemplo, martes 10:00) → hora de finalización `12:00` → "Reservar".                            |
-| **Resultado esperado** | La página muestra el aviso `"Reserva registrada correctamente."`, los bloques de 10:00 a 12:00 pasan a `Ocupado` y la reserva aparece en "Mis reservas", pestaña "Próximas". |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                                |
+Una historia se considera **Hecha** cuando cumple, además de sus criterios de aceptación, estos puntos comunes del equipo:
 
-#### Caso HU4-3 — Positivo: el responsable es el usuario autenticado
+- El código está en la rama `main` de Azure Repos y compila sin errores.
+- Existe interfaz web que permite realizar la función (no solo el endpoint) y la API aplica las reglas de negocio.
+- Las pruebas unitarias pasan en el pipeline y se ejecutaron los casos manuales documentados en [iv. Pruebas](#iv-pruebas-hu7-y-hu8).
+- El PBI está en estado *Done* y los commits referencian el PBI (`AB#7`, `AB#8`).
+- El README está actualizado y la funcionalidad se puede demostrar.
 
-| Campo                  | Detalle                                                                                                                                   |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que la reserva quede a nombre del usuario del token y no de otro.                                                               |
-| **Precondición**       | Tokens válidos de `user01` y `user02`; Lab Redes sin reservas el 2026-12-15.                                                              |
-| **Entrada**            | Con el token de `user02`: `POST /api/Reservas` con `laboratorioId = 2`, `fecha = 2026-12-15`, de `10:00:00` a `12:00:00`. Luego `GET /api/Reservas/mias` con cada token. |
-| **Resultado esperado** | `201 Created`. La reserva aparece en `/mias` de `user02` y no aparece en el de `user01`.                                                  |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                 |
+### HU7 - Consultar mis reservas
 
-#### Caso HU4-4 — Negativo: datos obligatorios incompletos
+- **Mostrar según usuario**: `GET /api/Reservas/mias` devuelve únicamente las reservas del usuario autenticado; su id sale del token, nunca de la URL. En el frontend, "Mis reservas" muestra solo esas reservas.
+- **Información mostrada**: laboratorio (con su ubicación), fecha, hora inicial, hora final, duración y estado de la reserva.
+- **Filtrar por estado**: pestañas **Próximas** (activas que aún no terminan) e **Historial** (finalizadas y canceladas), con contador, y una etiqueta de estado en cada fila (*Próxima*, *En curso*, *Finalizada*, *Cancelada*), de modo que se identifican claramente las activas y las canceladas.
+- Si no hay reservas en la pestaña, se muestra un mensaje en lugar de una tabla vacía.
+- **Vista de administrador**: el usuario con rol `Administrador` conserva su "Mis reservas" y dispone del enlace **"Ver todas las reservas"**, que consulta `GET /api/Reservas/todas` y agrega la columna *Usuario*. Un usuario normal no puede acceder a ese endpoint (`403`).
 
-| Campo                  | Detalle                                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que no se registre la reserva si faltan datos y que se informe la razón.                           |
-| **Precondición**       | Token válido de `user01`.                                                                                    |
-| **Entrada**            | `POST /api/Reservas` con `{ "laboratorioId": 1 }`                                                            |
-| **Resultado esperado** | `400 Bad Request` con `mensaje = "Debe indicar la fecha, la hora de inicio, la hora de finalización."` y sin registrar nada. |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                    |
+### HU8 - Cancelar una reserva
 
-#### Caso HU4-5 — Negativo: laboratorio inexistente
+- **Selección**: en la pestaña "Próximas", cada reserva cancelable tiene el botón **Cancelar** que abre una confirmación para esa reserva (con un motivo opcional de hasta 255 caracteres).
+- **Eliminación propia**: para un usuario normal, `POST /api/Reservas/{id}/cancelar` solo cancela sus propias reservas; si pertenece a otro usuario responde `404`, igual que si no existiera, y no se modifica.
+- **Eliminación por Admin**: el usuario con rol `Administrador` puede cancelar cualquier reserva. Desde "Ver todas las reservas" elige la reserva y la cancela igual que una propia; la cancelación queda registrada con el id del administrador en `CanceladaPorId`.
+- **Liberación de horario**: al cancelar, `Reservas.Estado` pasa a `Cancelada` y se registra la cancelación en la tabla `Cancelaciones` (quién, cuándo y motivo) en una sola operación. Como la disponibilidad y los conflictos solo consideran reservas `Activa`, otro usuario puede reservar ese horario de inmediato.
+- **Alerta de confirmación**: antes de cancelar el sistema pide confirmar ("¿Cancelar la reserva de …?") y, al terminar, muestra `"Reserva cancelada correctamente."`; si no se pudo, muestra el motivo.
+- **Reglas adicionales** (también para el administrador): no se puede cancelar una reserva ya cancelada (`409`) ni una que ya inició o finalizó (`409`).
 
-| Campo                  | Detalle                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar la respuesta cuando se reserva un laboratorio que no existe.                                   |
-| **Precondición**       | No existe el laboratorio con `LaboratorioId = 55`; token válido.                                         |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 55`, `fecha = 2026-12-10`, de `09:00:00` a `11:00:00`.         |
-| **Resultado esperado** | `404 Not Found` con `mensaje = "Laboratorio no encontrado."`.                                            |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                |
+## ii. Notas de la solución (HU7 y HU8)
 
-#### Caso HU4-6 — Negativo: acceso sin autenticación
+- **Flujo de consulta**: `ReservasController.Index` (frontend) → `GET api/Reservas/mias` (JWT agregado por `JWTAuthHandler`) → `ReservasController.GetMias` (API) → `Reservas` + `Laboratorios`. Resultado ordenado de la más reciente a la más antigua; el frontend la separa en Próximas e Historial. Si el usuario es administrador y elige "Ver todas las reservas" (`?todas=true`), el frontend llama a `GET api/Reservas/todas` (`GetTodas`, `[Authorize(Roles = "Administrador")]`), que además une `Usuarios` para devolver el nombre del responsable.
+- **Flujo de cancelación**: botón Cancelar → `POST /Reservas/Cancelar` (frontend, con token antifalsificación) → `POST api/Reservas/{id}/cancelar` → `ReservasController.Cancelar` (API) → `Reservas` y `Cancelaciones`. El resultado va a `TempData` y se redirige a "Mis reservas" conservando la pestaña activa.
+- **Orden de validaciones** de `POST /api/Reservas/{id}/cancelar`:
 
-| Campo                  | Detalle                                                          |
-| ---------------------- | ---------------------------------------------------------------- |
-| **Objetivo**           | Verificar que no se pueda reservar sin una sesión válida.        |
-| **Precondición**       | Ninguna.                                                         |
-| **Entrada**            | `POST /api/Reservas` **sin** el encabezado `Authorization`.      |
-| **Resultado esperado** | `401 Unauthorized`.                                              |
-| **Resultado obtenido** | Coincide con lo esperado.                                        |
+| Orden | Validación                                                         | Respuesta                                                              |
+|-------|--------------------------------------------------------------------|------------------------------------------------------------------------|
+| 1     | Token sin id de usuario válido                                     | `401 Unauthorized`                                                     |
+| 2     | Motivo de más de 255 caracteres                                    | `400` — `"El motivo no puede superar los 255 caracteres."`             |
+| 3     | Reserva inexistente, dada de baja o de otro usuario (salvo que quien cancela sea `Administrador`) | `404` — `"Reserva no encontrada."`                  |
+| 4     | Reserva ya cancelada                                               | `409` — `"La reserva ya se encuentra cancelada."`                      |
+| 5     | Reserva que ya inició o finalizó                                   | `409` — `"No se puede cancelar una reserva que ya inició o finalizó."` |
+| 6     | Todo correcto                                                      | `200` — `CancelarReservaResponse`                                      |
 
-### HU5 - Validar horario de reserva
+### DTOs
 
-#### Caso HU5-1 — Negativo: hora final no posterior a la hora inicial
+| DTO                       | Campos                                                                                                 | Uso                                  |
+|---------------------------|--------------------------------------------------------------------------------------------------------|--------------------------------------|
+| `MiReservaResponse`       | `reservaId`, `laboratorioId`, `laboratorio`, `ubicacion`, `fecha`, `horaInicio`, `horaFin`, `estado`, `fechaRegistro`, `usuario` (solo lo llena `/todas`) | Respuesta de `GET /api/Reservas/mias` (HU7) y `/todas` |
+| `CancelarReservaRequest`  | `motivo` (opcional)                                                                                    | Cuerpo de `POST /api/Reservas/{id}/cancelar` |
+| `CancelarReservaResponse` | `reservaId`, `estado`, `fechaCancelacion`, `mensaje`                                                   | Respuesta de la cancelación (HU8)    |
 
-| Campo                  | Detalle                                                                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que se rechace un horario donde la hora final no es posterior a la inicial.                                          |
-| **Precondición**       | Token válido; Lab Computo 1.                                                                                                   |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-10`, `horaInicio = 11:00:00`, `horaFin = 09:00:00` (también con ambas horas iguales). |
-| **Resultado esperado** | `400 Bad Request` con `mensaje = "La hora final debe ser posterior a la hora inicial."`.                                       |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                      |
+### Decisiones de diseño
 
-#### Caso HU5-2 — Negativo: fecha anterior a la actual
+- **Usuario tomado del token**: el contrato no incluye el usuario, así que nadie puede consultar ni cancelar reservas a nombre de otro.
+- **Reserva ajena = `404`**: para un usuario normal no se revela qué ids existen.
+- **Excepción por rol**: la regla de propiedad se evalúa con `User.IsInRole("Administrador")`; el rol viaja en el JWT (`ClaimTypes.Role`) y no en el cuerpo de la petición, así que no se puede falsificar desde el cliente. El administrador sigue sujeto a las reglas de estado y de tiempo.
+- **Vista de todas separada de "Mis reservas"**: `/mias` siempre devuelve solo las reservas propias (criterio de HU7); la vista completa del administrador es un endpoint aparte.
+- **Estados derivados**: la BD solo guarda `Activa` o `Cancelada`; *Próxima*, *En curso* y *Finalizada* se deducen comparando fecha y hora de la reserva con la actual (`MiReserva.ObtenerEstado`). El botón Cancelar solo aparece si la reserva está activa y aún no inicia (`PuedeCancelar`); la API lo vuelve a validar.
+- **Cancelación atómica**: el cambio de estado y el registro en `Cancelaciones` se guardan con un único `SaveChanges`; se guardan juntos o no se guardan.
+- **Un registro de cancelación por reserva** (`UQ_Can_Reserva`): si ya existía uno (por ejemplo, el dato semilla) se actualiza en lugar de insertar otro.
+- **Confirmación en la interfaz**: se usa un bloque desplegable con el detalle de la reserva y el campo de motivo, sin depender de JavaScript.
 
-| Campo                  | Detalle                                                                                                              |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que no se permita reservar en una fecha pasada.                                                            |
-| **Precondición**       | Token válido; Lab Computo 1.                                                                                         |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-10-01`, de `09:00:00` a `11:00:00`.                      |
-| **Resultado esperado** | `400 Bad Request` con `mensaje = "No se pueden realizar reservas en fechas anteriores a la fecha actual."`.          |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                            |
+### Observaciones y deuda técnica (HU7 y HU8)
 
-#### Caso HU5-3 — Negativo: fuera del horario de funcionamiento
+- **Administrador y reservas en curso**: el administrador tampoco puede cancelar una reserva que ya inició. Si el negocio lo requiere, habría que relajar esa regla solo para ese rol.
+- **Solo se cancelan reservas futuras**: una reserva en curso no se puede cancelar (decisión de negocio asumida; ajustable si el cliente indica lo contrario).
+- **Datos semilla**: la reserva 1 tiene una cancelación registrada pero su `Estado` sigue `Activa`; como su fecha ya pasó, el frontend la muestra como *Finalizada*. Las reservas semilla no sirven para probar cancelaciones por estar en el pasado.
+- **Fecha y hora del servidor**: `DateTime.Now` se evalúa en el servidor, sin zonas horarias.
+- **`[Authorize]` desactivado** en `LaboratoriosController` del frontend (el acceso sigue protegido porque la API responde `401` sin sesión válida); conviene reactivarlo.
 
-| Campo                  | Detalle                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que solo se pueda reservar dentro del horario de operación del laboratorio.                                    |
-| **Precondición**       | Token válido; Lab Redes opera de 08:00 a 20:00.                                                                          |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 2`, `fecha = 2026-12-10`, de `07:00:00` a `09:00:00`.                          |
-| **Resultado esperado** | `400 Bad Request` con `mensaje = "El laboratorio solo puede reservarse entre 08:00 y 20:00."`.                           |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                |
+## iii. Implementación (HU7 y HU8)
 
-#### Caso HU5-4 — Negativo: duración mayor a cuatro horas
+La configuración y ejecución están en [Información general del proyecto](#información-general-del-proyecto). Ambos endpoints requieren `Authorization: Bearer <token>`. Para el despliegue local basta levantar API y frontend juntos (perfil de arranque simultáneo) y, en integración continua, el pipeline compila y ejecuta las pruebas con cada push a `main`.
 
-| Campo                  | Detalle                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que una reserva no supere la duración máxima.                                           |
-| **Precondición**       | Token válido; Lab Computo 1.                                                                      |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-10`, de `09:00:00` a `14:00:00` (5 horas). |
-| **Resultado esperado** | `400 Bad Request` con `mensaje = "Una reserva no puede superar las 4 horas."`.                    |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                         |
+### Endpoints
 
-#### Caso HU5-5 — Positivo: duración exacta de cuatro horas
+| Método | Ruta                          | Historia | Descripción                                                                  |
+|--------|-------------------------------|----------|------------------------------------------------------------------------------|
+| GET    | `/api/Reservas/mias`          | HU7      | Lista las reservas (activas y canceladas) del usuario autenticado, de la más reciente a la más antigua |
+| GET    | `/api/Reservas/todas`         | HU7/HU8  | Solo `Administrador`: lista las reservas de todos los usuarios con el nombre del responsable |
+| POST   | `/api/Reservas/{id}/cancelar` | HU8      | Cancela una reserva propia que aún no ha iniciado (el administrador, cualquiera); el cuerpo con `motivo` es opcional |
 
-| Campo                  | Detalle                                                                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que el límite de cuatro horas sea inclusivo.                                               |
-| **Precondición**       | Token válido; Lab Computo 1 sin reservas el 2026-12-11.                                              |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-11`, de `09:00:00` a `13:00:00`.      |
-| **Resultado esperado** | `201 Created` con la reserva de 09:00 a 13:00.                                                       |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                            |
+Ejemplo de cancelación:
 
-#### Caso HU5-6 — Negativo: varias reglas incumplidas a la vez (validación total)
+```http
+POST /api/Reservas/4/cancelar
+Authorization: Bearer <token>
+Content-Type: application/json
 
-| Campo                  | Detalle                                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que el sistema evalúe todas las reglas y las informe juntas.                                                                                                   |
-| **Precondición**       | Token válido; Lab Computo 1.                                                                                                                                             |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-10-01`, de `09:00:00` a `14:00:00` (fecha pasada y 5 horas).                                                 |
-| **Resultado esperado** | `400 Bad Request` con las dos razones en `mensaje` y en la lista `errores`: fecha anterior a la actual y duración mayor a 4 horas.                                       |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                                |
+{ "motivo": "Ya no necesito el laboratorio" }
+```
 
-#### Caso HU5-7 — Neutro desde el Frontend: la hora final se limita según las reglas
+Respuesta exitosa (`200 OK`):
 
-| Campo                  | Detalle                                                                                                                                                         |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que la interfaz solo ofrezca horas finales válidas.                                                                                                   |
-| **Precondición**       | Sesión iniciada; Lab Redes (cierra a las 20:00) con bloques disponibles.                                                                                        |
-| **Entrada**            | Clic en un bloque `Disponible` de las 09:00 y luego en uno de las 19:00, revisando la lista "Hora de finalización".                                             |
-| **Resultado esperado** | Con inicio a las 09:00 la lista ofrece de 10:00 a 13:00 (máximo 4 horas); con inicio a las 19:00 solo ofrece 20:00 (no pasa del cierre). La duración mostrada se actualiza al cambiar la hora final. |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                       |
+```json
+{
+  "reservaId": 4,
+  "estado": "Cancelada",
+  "fechaCancelacion": "2026-11-08T18:30:00",
+  "mensaje": "Reserva cancelada correctamente."
+}
+```
 
-#### Caso HU5-8 — Negativo desde el Frontend: día anterior a hoy dentro de la semana en curso
+Ejemplo de rechazo (`409 Conflict`): `{ "mensaje": "La reserva ya se encuentra cancelada." }`
 
-| Campo                  | Detalle                                                                                                                                   |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que se rechace y se explique el motivo cuando se elige un día que ya pasó.                                                      |
-| **Precondición**       | Sesión iniciada; la semana en curso tiene días ya pasados (por ejemplo, un jueves y se elige el lunes).                                   |
-| **Entrada**            | Clic en un bloque `Disponible` de un día anterior a hoy → hora de finalización → "Reservar".                                              |
-| **Resultado esperado** | La página muestra el aviso en rojo `"No se pueden realizar reservas en fechas anteriores a la fecha actual."` y no se registra la reserva. |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                 |
+### Guía para probar en Scalar
 
-### HU6 - Evitar conflictos entre reservas
+1. Iniciar sesión en `/api/Auth/login` con `user01` y copiar el `token`.
+2. Registrar una reserva futura con `POST /api/Reservas` (por ejemplo, Lab 1, 2026-12-10, 09:00–11:00) y anotar su `reservaId`.
+3. Consultar `GET /api/Reservas/mias` y comprobar que aparece con `estado = "Activa"` (HU7).
+4. Cancelar con `POST /api/Reservas/{id}/cancelar` y volver a consultar `/mias`: el estado es `Cancelada` (HU8).
+5. Repetir el `POST /api/Reservas` del paso 2: ahora responde `201`, porque el horario quedó libre.
 
-Para los casos HU6-1 a HU6-4 se parte de una reserva activa: Lab Computo 1, 2026-12-14, de 09:00 a 11:00 (registrada con `POST /api/Reservas`).
+6. Como administrador: iniciar sesión con `Admi`, consultar `GET /api/Reservas/todas` y cancelar con `POST /api/Reservas/{id}/cancelar` una reserva de `user01`: responde `200`.
 
-#### Caso HU6-1 — Negativo: mismo laboratorio y mismo horario
+En todas las peticiones se agrega el encabezado `authorization` con el valor `Bearer <token>`.
 
-| Campo                  | Detalle                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que no se registren dos reservas idénticas para el mismo laboratorio.                                                      |
-| **Precondición**       | Reserva activa de Lab Computo 1, 2026-12-14, 09:00 – 11:00.                                                                          |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-14`, de `09:00:00` a `11:00:00`.                                      |
-| **Resultado esperado** | `409 Conflict` con `mensaje = "El laboratorio no se encuentra disponible en el horario solicitado."` y sin nueva reserva.            |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                            |
+### Guía para probar desde el frontend
 
-#### Caso HU6-2 — Negativo: traslape parcial o contenido
+1. Iniciar sesión y registrar una reserva futura desde "Ver disponibilidad" (HU4).
+2. Abrir **Mis reservas** en el menú superior: la reserva aparece en **Próximas** con su laboratorio, fecha, horario, duración y estado (HU7). Las finalizadas y canceladas están en **Historial**.
+3. Presionar **Cancelar** en la fila, escribir un motivo (opcional) y confirmar con **"Sí, cancelar reserva"** (HU8).
+4. La página muestra `"Reserva cancelada correctamente."` y la reserva pasa al **Historial** como *Cancelada*.
+5. Volver a la tabla de disponibilidad del laboratorio: el bloque está otra vez `Disponible`.
+6. Como administrador (`Admi`): en "Mis reservas" presionar **"Ver todas las reservas"**, localizar una reserva de otro usuario (columna *Usuario*) y cancelarla con el mismo procedimiento.
 
-| Campo                  | Detalle                                                                                                                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que se detecten los conflictos parciales y completos entre horarios.                                                                       |
-| **Precondición**       | Reserva activa de Lab Computo 1, 2026-12-14, 09:00 – 11:00.                                                                                          |
-| **Entrada**            | Cuatro peticiones `POST /api/Reservas` para Lab Computo 1 el 2026-12-14 con los horarios: `08:00–10:00` (traslape al inicio), `10:00–12:00` (traslape al final), `09:30–10:30` (contenido) y `08:00–12:00` (la cubre). |
-| **Resultado esperado** | Las cuatro responden `409 Conflict` con `"El laboratorio no se encuentra disponible en el horario solicitado."`.                                     |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                            |
+## iv. Pruebas (HU7 y HU8)
 
-#### Caso HU6-3 — Positivo: horario contiguo a una reserva
+### Pruebas automatizadas (xUnit)
 
-| Campo                  | Detalle                                                                                            |
-| ---------------------- | -------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que un horario que empieza justo cuando termina otra reserva no es un conflicto.         |
-| **Precondición**       | Reserva activa de Lab Computo 1, 2026-12-14, 09:00 – 11:00.                                        |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-14`, de `11:00:00` a `13:00:00`.    |
-| **Resultado esperado** | `201 Created`.                                                                                     |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                          |
+`cd WebApi_Test && dotnet test` ejecuta 45 pruebas con base en memoria, sin necesidad de SQL Server. Las de este sprint cubren la cancelación en `ReservasController_Cancelar_Tests`:
 
-#### Caso HU6-4 — Positivo: mismo horario en un laboratorio diferente
+| Prueba                                          | Verifica                                                                  |
+|-------------------------------------------------|---------------------------------------------------------------------------|
+| `Cancelar_HappyCase`                            | Cancela una reserva propia futura: `200`, estado `Cancelada` y registro en `Cancelaciones` con el motivo (sin espacios sobrantes) |
+| `Cancelar_SinMotivo_Funciona`                   | La cancelación sin motivo funciona y guarda el motivo nulo                |
+| `Cancelar_ReservaDeOtroUsuario_NoEncontrada`    | `404`; la reserva sigue `Activa` y no se crea cancelación                 |
+| `Cancelar_ReservaInexistente_NoEncontrada`      | `404` con un id inexistente                                               |
+| `Cancelar_YaCancelada_Conflicto`                | `409` al cancelar dos veces                                               |
+| `Cancelar_ReservaPasada_Conflicto`              | `409`; la reserva pasada sigue `Activa`                                   |
+| `Cancelar_MotivoDemasiadoLargo_BadRequest`      | `400` con motivo de 256 caracteres; la reserva no cambia                  |
+| `Cancelar_SinToken_NoAutorizado`                | Sin usuario autenticado, rechaza la solicitud (`401`)                     |
+| `Cancelar_Administrador_PuedeCancelarReservaDeOtroUsuario` | El administrador cancela una reserva ajena: `200`, estado `Cancelada` y `CanceladaPorId` = id del administrador |
+| `Cancelar_UsuarioNormal_ReservaDeOtro_NoEncontrada` | Un usuario con rol `Usuario` no puede cancelar una reserva ajena: `404` y sigue `Activa` |
+| `Cancelar_Administrador_ReservaPasada_Conflicto` | Las reglas de tiempo aplican también al administrador: `409`             |
 
-| Campo                  | Detalle                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que los conflictos se evalúen por laboratorio.                                        |
-| **Precondición**       | Reserva activa de Lab Computo 1, 2026-12-14, 09:00 – 11:00; Lab Redes sin reservas ese día.     |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 2`, `fecha = 2026-12-14`, de `09:00:00` a `11:00:00`. |
-| **Resultado esperado** | `201 Created`.                                                                                  |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                       |
+La consulta de "mis reservas" y de "todas" (HU7) se verifica con los casos manuales siguientes. Pendiente: pruebas unitarias de `GetMias` y `GetTodas`.
 
-#### Caso HU6-5 — Positivo: una reserva cancelada no bloquea el horario
+### Pruebas manuales
 
-| Campo                  | Detalle                                                                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Objetivo**           | Verificar que solo las reservas activas generen conflicto.                                                                                                                           |
-| **Precondición**       | Reserva de Lab Computo 1, 2026-12-16, 14:00 – 16:00, cuyo estado se cambia a cancelada en la base de datos: `UPDATE Reservas SET Estado = 'Cancelada' WHERE ReservaId = <id>;`.      |
-| **Entrada**            | `POST /api/Reservas` con `laboratorioId = 1`, `fecha = 2026-12-16`, de `14:00:00` a `16:00:00`.                                                                                      |
-| **Resultado esperado** | `201 Created`.                                                                                                                                                                       |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                                            |
+Se usan tokens de `user01`, `user02`, `user03` y `Admi`, y fechas futuras (diciembre de 2026). Antes de las pruebas de cancelación se registra con `POST /api/Reservas` una reserva futura por usuario.
 
-#### Caso HU6-6 — Negativo desde el Frontend: la hora final alcanza un bloque ocupado
+#### HU7 - Consultar mis reservas
 
-| Campo                  | Detalle                                                                                                                                                                      |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Objetivo**           | Verificar que la interfaz informe el conflicto y muestre el estado real del laboratorio.                                                                                     |
-| **Precondición**       | Sesión iniciada; Lab Computo 1 tiene una reserva activa el martes de la semana siguiente de 11:00 a 12:00; el bloque de las 10:00 de ese día está `Disponible`.              |
-| **Entrada**            | Clic en el bloque `Disponible` de las 10:00 de ese martes → hora de finalización `13:00` (cruza el bloque ocupado) → "Reservar".                                              |
-| **Resultado esperado** | La página muestra el aviso en rojo `"El laboratorio no se encuentra disponible en el horario solicitado."`, no se crea la reserva y la tabla conserva el bloque de 11:00 como `Ocupado`. |
-| **Resultado obtenido** | Coincide con lo esperado.                                                                                                                                                    |
+| Caso  | Tipo     | Entrada / precondición                                                        | Resultado esperado                                                                                   | Resultado |
+|-------|----------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|-----------|
+| HU7-1 | Positivo | `GET /api/Reservas/mias` con el token de `user01` y luego con el de `user02`  | Cada respuesta incluye solo las reservas de su usuario (`user01`: reservas 1 y 3 semilla más las que registre; `user02`: la 2 más las que registre) | ✔ Coincide |
+| HU7-2 | Positivo | Frontend: `user01` con una reserva futura abre "Mis reservas"                 | La fila muestra laboratorio, ubicación, fecha, hora inicial, hora final, duración y estado *Próxima* | ✔ Coincide |
+| HU7-3 | Positivo | Frontend: `user01` tiene una reserva activa y otra cancelada                  | La activa aparece en **Próximas** y la cancelada en **Historial** con la etiqueta *Cancelada*; los contadores coinciden | ✔ Coincide |
+| HU7-4 | Neutro   | Frontend: `user03` (sin reservas) abre "Mis reservas"                         | Se muestra el mensaje de que no hay reservas y el botón para ver laboratorios                        | ✔ Coincide |
+| HU7-5 | Negativo | `GET /api/Reservas/mias` sin el encabezado `Authorization`                    | `401 Unauthorized`                                                                                   | ✔ Coincide |
+| HU7-6 | Negativo | Frontend: abrir `/Reservas` sin sesión iniciada                               | Redirige al login                                                                                    | ✔ Coincide |
+| HU7-7 | Positivo | Administrador (`Admi`): `GET /api/Reservas/todas` o "Ver todas las reservas" en el frontend | Lista las reservas de todos los usuarios con el nombre del responsable; "Mis reservas" sigue mostrando solo las del administrador | ✔ Coincide |
+| HU7-8 | Negativo | `user01` (rol Usuario): `GET /api/Reservas/todas`                             | `403 Forbidden`; en el frontend no se muestra el enlace "Ver todas las reservas"                    | ✔ Coincide |
 
-> Nota: las pruebas se realizaron tanto desde la interfaz del API como desde el propio Frontend, para confirmar que las reglas se cumplen en ambas partes.
+#### HU8 - Cancelar una reserva
+
+| Caso  | Tipo     | Entrada / precondición                                                           | Resultado esperado                                                                                         | Resultado |
+|-------|----------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|-----------|
+| HU8-1 | Positivo | `user01` cancela con `POST /api/Reservas/{id}/cancelar` una reserva futura propia, con motivo | `200`, `estado = "Cancelada"`, `"Reserva cancelada correctamente."`; en `/mias` figura `Cancelada` y queda un registro en `Cancelaciones` | ✔ Coincide |
+| HU8-2 | Positivo | Frontend: en "Próximas", **Cancelar** → motivo → **"Sí, cancelar reserva"**      | Aviso `"Reserva cancelada correctamente."`; la reserva pasa a **Historial** como *Cancelada*               | ✔ Coincide |
+| HU8-3 | Positivo | Tras HU8-1, `user02` intenta reservar el mismo laboratorio, fecha y horario      | `201 Created`: el horario quedó liberado (y en la tabla el bloque vuelve a `Disponible`)                   | ✔ Coincide |
+| HU8-4 | Neutro   | Cancelar sin escribir motivo (API sin cuerpo o frontend con el campo vacío)      | La cancelación se realiza igualmente y el motivo queda nulo                                                | ✔ Coincide |
+| HU8-5 | Negativo | `user02` intenta cancelar la reserva de `user01`                                 | `404` — `"Reserva no encontrada."`; la reserva de `user01` sigue `Activa`                                  | ✔ Coincide |
+| HU8-6 | Negativo | Cancelar una reserva que ya está cancelada                                       | `409` — `"La reserva ya se encuentra cancelada."`                                                          | ✔ Coincide |
+| HU8-7 | Negativo | Cancelar una reserva que ya inició o finalizó (por ejemplo, la reserva semilla 3) | `409` — `"No se puede cancelar una reserva que ya inició o finalizó."`; sigue `Activa`                     | ✔ Coincide |
+| HU8-8 | Negativo | Motivo de más de 255 caracteres                                                  | `400` — `"El motivo no puede superar los 255 caracteres."`; la reserva no cambia                           | ✔ Coincide |
+| HU8-9 | Negativo | Cancelar un id inexistente (por ejemplo, 999) y cancelar sin token               | `404` — `"Reserva no encontrada."`; sin token, `401 Unauthorized`                                          | ✔ Coincide |
+| HU8-10 | Neutro  | Frontend: observar las reservas *En curso* y las del Historial                   | No ofrecen el botón Cancelar (la pestaña Historial no tiene la columna de acciones)                        | ✔ Coincide |
+| HU8-11 | Positivo | Administrador (`Admi`) cancela una reserva futura de `user01` (API o "Ver todas las reservas") | `200` y `"Reserva cancelada correctamente."`; la reserva pasa a `Cancelada` y `Cancelaciones.CanceladaPorId` es el id del administrador | ✔ Coincide |
+
+> Las pruebas manuales se realizan tanto desde el API (Scalar) como desde el Frontend, para confirmar que las reglas se cumplen en ambas partes.

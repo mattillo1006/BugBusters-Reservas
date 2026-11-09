@@ -15,6 +15,7 @@
         public int LaboratorioId { get; set; }
         public string Laboratorio { get; set; } = string.Empty;
         public string Ubicacion { get; set; } = string.Empty;
+        public string? Usuario { get; set; }
         public DateTime Fecha { get; set; }
         public TimeSpan HoraInicio { get; set; }
         public TimeSpan HoraFin { get; set; }
@@ -45,6 +46,7 @@
         public const string FiltroHistorial = "historial";
 
         public string Filtro { get; set; } = FiltroProximas;
+        public bool Todas { get; set; }
         public DateTime Ahora { get; set; }
 
         // Activas que aún no terminan (incluye la que está en curso), la más cercana primero

@@ -22,12 +22,13 @@ namespace WebApi_Test.Pruebas_Unitarias
         }
 
         // El controlador lee el id del usuario del token, así que se simula un usuario autenticado
-        private static ReservasController CrearControlador(ReservasDBContext context, int? usuarioId)
+        private static ReservasController CrearControlador(ReservasDBContext context, int? usuarioId, string? rol = null)
         {
             var controller = new ReservasController(context);
-            var identity = usuarioId is null
-                ? new ClaimsIdentity()
-                : new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, usuarioId.Value.ToString()) }, "Test");
+            var claims = new List<Claim>();
+            if (usuarioId is not null) claims.Add(new Claim(ClaimTypes.NameIdentifier, usuarioId.Value.ToString()));
+            if (rol is not null) claims.Add(new Claim(ClaimTypes.Role, rol));
+            var identity = claims.Count == 0 ? new ClaimsIdentity() : new ClaimsIdentity(claims, "Test");
 
             controller.ControllerContext = new ControllerContext
             {
@@ -201,6 +202,46 @@ namespace WebApi_Test.Pruebas_Unitarias
 
             // Assert: la API rechaza la solicitud por falta de autenticación.
             Assert.IsType<UnauthorizedResult>(result.Result);
+        }
+
+
+        [Fact]
+        public async Task Cancelar_Administrador_PuedeCancelarReservaDeOtroUsuario()
+        {
+            using var context = CrearContexto();
+            var reserva = await AgregarReserva(context, 1, FechaFutura, TimeSpan.FromHours(9), TimeSpan.FromHours(11));
+            var controller = CrearControlador(context, 99, "Administrador");
+
+            var result = await controller.Cancelar(reserva.ReservaId, null);
+
+            Assert.IsType<OkObjectResult>(result.Result);
+            Assert.Equal("Cancelada", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
+            Assert.Equal(99, (await context.Cancelaciones.SingleAsync(TestContext.Current.CancellationToken)).CanceladaPorId);
+        }
+
+        [Fact]
+        public async Task Cancelar_UsuarioNormal_ReservaDeOtro_NoEncontrada()
+        {
+            using var context = CrearContexto();
+            var reserva = await AgregarReserva(context, 1, FechaFutura, TimeSpan.FromHours(9), TimeSpan.FromHours(11));
+            var controller = CrearControlador(context, 2, "Usuario");
+
+            var result = await controller.Cancelar(reserva.ReservaId, null);
+
+            Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal("Activa", (await context.Reservas.SingleAsync(TestContext.Current.CancellationToken)).Estado);
+        }
+
+        [Fact]
+        public async Task Cancelar_Administrador_ReservaPasada_Conflicto()
+        {
+            using var context = CrearContexto();
+            var reserva = await AgregarReserva(context, 1, DateTime.Today.AddDays(-1), TimeSpan.FromHours(9), TimeSpan.FromHours(11));
+            var controller = CrearControlador(context, 99, "Administrador");
+
+            var result = await controller.Cancelar(reserva.ReservaId, null);
+
+            Assert.IsType<ConflictObjectResult>(result.Result);
         }
     }
 }
